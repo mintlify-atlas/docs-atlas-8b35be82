@@ -1,0 +1,344 @@
+---
+title: "Graphs"
+description: "Learn about graphs - collections of nodes connected by edges"
+---
+
+## What is a Graph?
+
+A graph is a non-linear data structure consisting of:
+- **Vertices (nodes)**: The entities or points
+- **Edges**: Connections between vertices
+
+Graphs model relationships and networks, making them fundamental for solving real-world connectivity problems.
+
+<Frame>
+  <img src="/graph.gif" alt="Graph visualization showing nodes and edges" />
+</Frame>
+
+## Graph Types
+
+<CardGroup cols={2}>
+  <Card title="Directed Graph" icon="arrow-right">
+    Edges have direction (A → B is different from B → A)
+  </Card>
+  <Card title="Undirected Graph" icon="arrows-left-right">
+    Edges have no direction (A — B means bidirectional)
+  </Card>
+  <Card title="Weighted Graph" icon="scale-balanced">
+    Edges have weights/costs associated with them
+  </Card>
+  <Card title="Unweighted Graph" icon="equals">
+    All edges have equal weight (or no weight)
+  </Card>
+  <Card title="Cyclic Graph" icon="rotate">
+    Contains at least one cycle (path back to starting node)
+  </Card>
+  <Card title="Acyclic Graph" icon="diagram-project">
+    No cycles exist (DAG: Directed Acyclic Graph)
+  </Card>
+  <Card title="Connected Graph" icon="link">
+    Path exists between every pair of vertices
+  </Card>
+  <Card title="Disconnected Graph" icon="unlink">
+    Some vertices are not reachable from others
+  </Card>
+</CardGroup>
+
+## Graph Representation
+
+<Tabs>
+  <Tab title="Adjacency List">
+    Dictionary/array where each vertex stores list of adjacent vertices.
+    
+    ```python
+    # Space: O(V + E)
+    graph = {
+        'A': ['B', 'C'],
+        'B': ['A', 'D'],
+        'C': ['A', 'D'],
+        'D': ['B', 'C']
+    }
+    ```
+    
+    **Best for**: Sparse graphs, space efficiency
+  </Tab>
+  
+  <Tab title="Adjacency Matrix">
+    2D array where cell [i][j] indicates edge from vertex i to j.
+    
+    ```python
+    # Space: O(V²)
+    # 0=no edge, 1=edge (or weight for weighted graphs)
+    matrix = [
+        [0, 1, 1, 0],  # A connects to B, C
+        [1, 0, 0, 1],  # B connects to A, D
+        [1, 0, 0, 1],  # C connects to A, D
+        [0, 1, 1, 0]   # D connects to B, C
+    ]
+    ```
+    
+    **Best for**: Dense graphs, quick edge lookup
+  </Tab>
+  
+  <Tab title="Edge List">
+    Simple list of all edges in the graph.
+    
+    ```python
+    # Space: O(E)
+    edges = [
+        ('A', 'B'),
+        ('A', 'C'),
+        ('B', 'D'),
+        ('C', 'D')
+    ]
+    ```
+    
+    **Best for**: Simple graphs, edge-focused algorithms
+  </Tab>
+</Tabs>
+
+## Time Complexity
+
+| Operation | Adjacency List | Adjacency Matrix |
+|-----------|---------------|------------------|
+| Add vertex | **O(1)** | **O(V²)** |
+| Add edge | **O(1)** | **O(1)** |
+| Remove vertex | **O(V + E)** | **O(V²)** |
+| Remove edge | **O(E)** | **O(1)** |
+| Check if edge exists | **O(V)** | **O(1)** |
+| Space | **O(V + E)** | **O(V²)** |
+
+## Graph Implementation
+
+```python
+class Graph:
+    def __init__(self):
+        self.graph = {}  # Adjacency list
+    
+    def add_vertex(self, vertex):
+        if vertex not in self.graph:
+            self.graph[vertex] = []
+    
+    def add_edge(self, v1, v2, directed=False):
+        self.add_vertex(v1)
+        self.add_vertex(v2)
+        self.graph[v1].append(v2)
+        if not directed:
+            self.graph[v2].append(v1)
+    
+    def remove_edge(self, v1, v2, directed=False):
+        if v1 in self.graph:
+            self.graph[v1] = [v for v in self.graph[v1] if v != v2]
+        if not directed and v2 in self.graph:
+            self.graph[v2] = [v for v in self.graph[v2] if v != v1]
+```
+
+## Graph Traversal Algorithms
+
+### Breadth-First Search (BFS)
+
+Explores level by level using a queue.
+
+```python
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+    
+    while queue:
+        vertex = queue.popleft()
+        print(vertex)
+        
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    # Time: O(V + E), Space: O(V)
+```
+
+**Use cases**: Shortest path in unweighted graph, level-order traversal
+
+### Depth-First Search (DFS)
+
+Explores as deep as possible before backtracking.
+
+```python
+def dfs(graph, vertex, visited=None):
+    if visited is None:
+        visited = set()
+    
+    visited.add(vertex)
+    print(vertex)
+    
+    for neighbor in graph[vertex]:
+        if neighbor not in visited:
+            dfs(graph, neighbor, visited)
+    
+    return visited
+    # Time: O(V + E), Space: O(V)
+```
+
+**Use cases**: Cycle detection, topological sorting, pathfinding
+
+## Important Graph Algorithms
+
+<AccordionGroup>
+  <Accordion title="Dijkstra's Algorithm">
+    **Purpose**: Shortest path from source to all vertices (non-negative weights)
+    
+    **Time Complexity**: O((V + E) log V) with min-heap
+    
+    **Use case**: GPS navigation, network routing
+  </Accordion>
+  
+  <Accordion title="Bellman-Ford Algorithm">
+    **Purpose**: Shortest path with negative weights allowed
+    
+    **Time Complexity**: O(V × E)
+    
+    **Use case**: Currency arbitrage, routing with costs
+  </Accordion>
+  
+  <Accordion title="Floyd-Warshall Algorithm">
+    **Purpose**: All-pairs shortest paths
+    
+    **Time Complexity**: O(V³)
+    
+    **Use case**: Finding transitive closure, routing tables
+  </Accordion>
+  
+  <Accordion title="Kruskal's Algorithm">
+    **Purpose**: Minimum Spanning Tree (MST)
+    
+    **Time Complexity**: O(E log E)
+    
+    **Use case**: Network design, clustering
+  </Accordion>
+  
+  <Accordion title="Prim's Algorithm">
+    **Purpose**: Minimum Spanning Tree (MST)
+    
+    **Time Complexity**: O(E log V) with min-heap
+    
+    **Use case**: Network design, approximation algorithms
+  </Accordion>
+  
+  <Accordion title="Topological Sort">
+    **Purpose**: Linear ordering of vertices (DAG only)
+    
+    **Time Complexity**: O(V + E)
+    
+    **Use case**: Task scheduling, build systems
+  </Accordion>
+</AccordionGroup>
+
+## Common Graph Problems
+
+<CodeGroup>
+```python Cycle Detection
+def has_cycle(graph):
+    visited = set()
+    rec_stack = set()
+    
+    def dfs(vertex):
+        visited.add(vertex)
+        rec_stack.add(vertex)
+        
+        for neighbor in graph.get(vertex, []):
+            if neighbor not in visited:
+                if dfs(neighbor):
+                    return True
+            elif neighbor in rec_stack:
+                return True
+        
+        rec_stack.remove(vertex)
+        return False
+    
+    for vertex in graph:
+        if vertex not in visited:
+            if dfs(vertex):
+                return True
+    return False
+```
+
+```python Connected Components
+def count_components(graph):
+    visited = set()
+    count = 0
+    
+    def dfs(vertex):
+        visited.add(vertex)
+        for neighbor in graph.get(vertex, []):
+            if neighbor not in visited:
+                dfs(neighbor)
+    
+    for vertex in graph:
+        if vertex not in visited:
+            dfs(vertex)
+            count += 1
+    
+    return count
+```
+
+```python Is Bipartite
+def is_bipartite(graph):
+    color = {}
+    
+    def bfs(start):
+        queue = deque([start])
+        color[start] = 0
+        
+        while queue:
+            vertex = queue.popleft()
+            for neighbor in graph[vertex]:
+                if neighbor not in color:
+                    color[neighbor] = 1 - color[vertex]
+                    queue.append(neighbor)
+                elif color[neighbor] == color[vertex]:
+                    return False
+        return True
+    
+    for vertex in graph:
+        if vertex not in color:
+            if not bfs(vertex):
+                return False
+    return True
+```
+</CodeGroup>
+
+## Space Complexity
+
+- **Adjacency List**: O(V + E) - most space-efficient
+- **Adjacency Matrix**: O(V²) - can be wasteful for sparse graphs
+- **Edge List**: O(E) - minimal space, limited functionality
+
+## Real-World Applications
+
+- **Social Networks**: Friend connections, recommendations
+- **Maps & Navigation**: Road networks, shortest paths
+- **Internet**: Web pages (vertices), hyperlinks (edges)
+- **Computer Networks**: Routers and connections
+- **Dependencies**: Package managers, build systems
+- **Recommendation Systems**: Users, products, preferences
+- **Biology**: Protein interactions, neural networks
+- **Transportation**: Flight routes, logistics
+
+## Interactive Learning
+
+EliteCode's graph module provides interactive visualizations:
+
+- Build graphs by adding vertices and edges
+- Watch BFS and DFS traversals in real-time
+- Visualize shortest path algorithms
+- Understand connected components
+- See cycle detection in action
+
+<Tip>
+  For sparse graphs (few edges), use adjacency lists. For dense graphs (many edges) or when you need O(1) edge lookup, use adjacency matrix.
+</Tip>
+
+<Note>
+  Many real-world problems can be modeled as graph problems. Master graphs to unlock powerful algorithmic solutions.
+</Note>

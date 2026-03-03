@@ -1,0 +1,265 @@
+---
+title: "Trees"
+description: "Learn about trees - hierarchical data structures with roots and branches"
+---
+
+## What is a Tree?
+
+A tree is a **hierarchical data structure** consisting of nodes connected by edges. It mimics a tree structure with a root at the top and branches extending downward.
+
+<Frame>
+  <img src="/trees.gif" alt="Tree visualization showing hierarchical structure" />
+</Frame>
+
+## Key Terminology
+
+<CardGroup cols={2}>
+  <Card title="Root" icon="arrow-up">
+    The topmost node with no parent
+  </Card>
+  <Card title="Parent" icon="diagram-project">
+    A node that has child nodes below it
+  </Card>
+  <Card title="Child" icon="code-branch">
+    A node directly connected below another node
+  </Card>
+  <Card title="Leaf" icon="leaf">
+    A node with no children (terminal node)
+  </Card>
+  <Card title="Height" icon="ruler-vertical">
+    Length of longest path from node to leaf
+  </Card>
+  <Card title="Depth" icon="layer-group">
+    Length of path from root to the node
+  </Card>
+  <Card title="Subtree" icon="sitemap">
+    A tree formed by a node and its descendants
+  </Card>
+  <Card title="Edge" icon="link">
+    Connection between two nodes
+  </Card>
+</CardGroup>
+
+## Types of Trees
+
+### Binary Tree
+Each node has **at most 2 children** (left and right)
+
+### Binary Search Tree (BST)
+Binary tree with ordering property:
+- Left subtree contains values **less than** parent
+- Right subtree contains values **greater than** parent
+
+### AVL Tree
+Self-balancing BST where heights of subtrees differ by at most 1
+
+### Red-Black Tree
+Self-balancing BST with color properties ensuring balance
+
+### B-Tree
+Self-balancing tree optimized for disk access, used in databases
+
+### Trie (Prefix Tree)
+Tree for storing strings, common prefix sharing
+
+## Time Complexity
+
+### Binary Search Tree (BST)
+
+| Operation | Average Case | Worst Case | Balanced Tree |
+|-----------|-------------|------------|---------------|
+| Search | **O(log n)** | **O(n)** | **O(log n)** |
+| Insert | **O(log n)** | **O(n)** | **O(log n)** |
+| Delete | **O(log n)** | **O(n)** | **O(log n)** |
+| Traverse | **O(n)** | **O(n)** | **O(n)** |
+
+<Note>
+  Worst case O(n) occurs when tree becomes skewed (essentially a linked list). Balanced trees guarantee O(log n) operations.
+</Note>
+
+## Tree Node Structure
+
+```python
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
+```
+
+## Common Operations
+
+### Insertion (BST)
+
+```python
+def insert(self, root, value):
+    # Base case: empty tree
+    if root is None:
+        return TreeNode(value)
+    
+    # Recursive insertion
+    if value < root.value:
+        root.left = self.insert(root.left, value)
+    elif value > root.value:
+        root.right = self.insert(root.right, value)
+    
+    return root
+    # Time: O(log n) average, O(n) worst
+```
+
+### Search (BST)
+
+```python
+def search(self, root, value):
+    # Base cases
+    if root is None or root.value == value:
+        return root
+    
+    # Value is in left subtree
+    if value < root.value:
+        return self.search(root.left, value)
+    
+    # Value is in right subtree
+    return self.search(root.right, value)
+    # Time: O(log n) average, O(n) worst
+```
+
+## Tree Traversal Methods
+
+<Tabs>
+  <Tab title="Inorder (Left-Root-Right)">
+    ```python
+    def inorder(self, root):
+        if root:
+            self.inorder(root.left)
+            print(root.value)
+            self.inorder(root.right)
+    # For BST: produces sorted order
+    ```
+  </Tab>
+  
+  <Tab title="Preorder (Root-Left-Right)">
+    ```python
+    def preorder(self, root):
+        if root:
+            print(root.value)
+            self.preorder(root.left)
+            self.preorder(root.right)
+    # Useful for copying tree structure
+    ```
+  </Tab>
+  
+  <Tab title="Postorder (Left-Right-Root)">
+    ```python
+    def postorder(self, root):
+        if root:
+            self.postorder(root.left)
+            self.postorder(root.right)
+            print(root.value)
+    # Useful for deleting tree
+    ```
+  </Tab>
+  
+  <Tab title="Level Order (BFS)">
+    ```python
+    def level_order(self, root):
+        if not root:
+            return
+        queue = [root]
+        while queue:
+            node = queue.pop(0)
+            print(node.value)
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+    # Traverse level by level
+    ```
+  </Tab>
+</Tabs>
+
+## Space Complexity
+
+- **Storage**: O(n) for n nodes
+- **Recursion stack**: O(h) where h is height
+  - Best case (balanced): O(log n)
+  - Worst case (skewed): O(n)
+
+## Advantages vs Disadvantages
+
+<AccordionGroup>
+  <Accordion title="Advantages">
+    - Hierarchical representation of data
+    - Fast search, insert, delete in balanced trees - O(log n)
+    - Efficient for sorted data (BST inorder traversal)
+    - Flexible size (dynamic)
+    - Natural for recursive algorithms
+  </Accordion>
+  
+  <Accordion title="Disadvantages">
+    - Can become unbalanced (O(n) operations)
+    - More complex implementation than arrays
+    - Extra memory for pointers
+    - No direct access to elements
+    - Requires balancing strategies
+  </Accordion>
+</AccordionGroup>
+
+## Tree Properties
+
+<CodeGroup>
+```python Height
+def height(root):
+    if root is None:
+        return -1
+    return 1 + max(height(root.left), height(root.right))
+```
+
+```python Size
+def size(root):
+    if root is None:
+        return 0
+    return 1 + size(root.left) + size(root.right)
+```
+
+```python Is BST
+def is_bst(root, min_val=float('-inf'), max_val=float('inf')):
+    if root is None:
+        return True
+    if root.value <= min_val or root.value >= max_val:
+        return False
+    return (is_bst(root.left, min_val, root.value) and
+            is_bst(root.right, root.value, max_val))
+```
+</CodeGroup>
+
+## Real-World Applications
+
+- **File systems**: Directory structure (folders and files)
+- **Databases**: B-trees for indexing
+- **Compilers**: Abstract Syntax Trees (AST)
+- **Artificial Intelligence**: Decision trees, game trees
+- **Autocomplete**: Trie for word suggestions
+- **HTML DOM**: Document structure
+- **Organization charts**: Hierarchical relationships
+
+## Interactive Learning
+
+Explore trees visually in EliteCode's interactive module:
+
+- Watch how nodes are inserted and maintain BST property
+- See different traversal methods in action
+- Understand tree balancing concepts
+- Practice finding paths and calculating heights
+
+<Tip>
+  To keep a BST balanced, use self-balancing variants like AVL trees or Red-Black trees. This ensures O(log n) operations even in worst case.
+</Tip>
+
+<Warning>
+  When implementing tree operations, always handle the NULL/None case first to avoid runtime errors.
+</Warning>

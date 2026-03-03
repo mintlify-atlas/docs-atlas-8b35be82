@@ -1,0 +1,186 @@
+---
+title: 'Whisper Speech-to-Text API'
+description: 'Convert audio files to text using OpenAI Whisper model'
+---
+
+## Overview
+
+The Whisper API provides speech-to-text transcription capabilities using OpenAI's Whisper model. It's built with Flask and supports GPU acceleration for faster processing.
+
+## Endpoint
+
+### `POST /whisper`
+
+Transcribes audio files to text.
+
+**Base URL**: Your Flask server URL (typically `http://localhost:5000`)
+
+<ParamField body="file" type="file" required>
+  Audio file(s) to transcribe. Supports multiple files in a single request.
+</ParamField>
+
+<ResponseField name="results" type="array">
+  Array of transcription results for each uploaded file
+  
+  <ResponseField name="filename" type="string">
+    Original filename of the uploaded audio
+  </ResponseField>
+  
+  <ResponseField name="transcript" type="string">
+    Transcribed text from the audio file
+  </ResponseField>
+</ResponseField>
+
+## Configuration
+
+### Model Settings
+
+<ParamField path="model" type="string" default="base">
+  Whisper model size. Options: `tiny`, `base`, `small`, `medium`, `large`
+</ParamField>
+
+<ParamField path="device" type="string" default="cpu">
+  Processing device. Automatically set to `cuda` if NVIDIA GPU is available, otherwise `cpu`
+</ParamField>
+
+### Device Detection
+
+The API automatically detects available hardware:
+
+```python
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+model = whisper.load_model("base", device=DEVICE)
+```
+
+## Usage Examples
+
+### cURL Example
+
+```bash
+curl -X POST http://localhost:5000/whisper \
+  -F "audio1=@recording.mp3" \
+  -F "audio2=@speech.wav"
+```
+
+### JavaScript/Fetch Example
+
+```javascript
+const formData = new FormData();
+formData.append('audio', audioFile);
+
+const response = await fetch('http://localhost:5000/whisper', {
+  method: 'POST',
+  body: formData
+});
+
+const data = await response.json();
+console.log(data.results[0].transcript);
+```
+
+### Python Example
+
+```python
+import requests
+
+with open('audio.mp3', 'rb') as f:
+    files = {'audio': f}
+    response = requests.post('http://localhost:5000/whisper', files=files)
+    
+transcript = response.json()['results'][0]['transcript']
+print(transcript)
+```
+
+## Response Format
+
+### Success Response (200)
+
+```json
+{
+  "results": [
+    {
+      "filename": "audio1",
+      "transcript": "This is the transcribed text from the audio file."
+    },
+    {
+      "filename": "audio2",
+      "transcript": "Another transcription for the second file."
+    }
+  ]
+}
+```
+
+### Error Response (400)
+
+Returned when no files are submitted:
+
+```json
+{
+  "error": "Bad Request"
+}
+```
+
+## Code Reference
+
+Source: `src/python/app.py:21`
+
+```python
+@app.route('/whisper', methods=['POST'])
+def whisper_handler():
+    if not request.files:
+        abort(400)
+
+    results = []
+
+    for filename, handle in request.files.items():
+        temp = NamedTemporaryFile()
+        handle.save(temp)
+        result = model.transcribe(temp.name)
+        results.append({
+            'filename': filename,
+            'transcript': result['text'],
+        })
+
+    return {'results': results}
+```
+
+## Installation
+
+Install required dependencies:
+
+```bash
+pip install flask flask-cors openai-whisper torch
+```
+
+For GPU support (recommended):
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+## Running the Server
+
+```bash
+python src/python/app.py
+```
+
+Or with Flask:
+
+```bash
+export FLASK_APP=src/python/app.py
+flask run
+```
+
+## Features
+
+- **Multi-file Support**: Process multiple audio files in a single request
+- **GPU Acceleration**: Automatically uses CUDA if available
+- **CORS Enabled**: Ready for cross-origin requests from web apps
+- **Temporary File Handling**: Secure processing with automatic cleanup
+- **Multiple Audio Formats**: Supports MP3, WAV, M4A, and more
+
+## Performance Notes
+
+- **Base Model**: Good balance between speed and accuracy
+- **GPU Processing**: Significantly faster transcription with CUDA
+- **File Size**: Larger files take proportionally longer to process
+- **Concurrent Requests**: Flask handles requests sequentially by default

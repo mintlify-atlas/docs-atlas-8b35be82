@@ -1,0 +1,171 @@
+---
+title: Introduction to EliteCode
+description: Master data structures and algorithms through AI-powered voice interaction
+---
+
+## Welcome to EliteCode
+
+EliteCode is an AI-powered interactive learning platform that revolutionizes how you master data structures and algorithms. Instead of reading textbooks or watching videos, you learn by speaking - explaining concepts out loud while receiving real-time AI feedback through voice interaction.
+
+## What is EliteCode?
+
+EliteCode combines cutting-edge speech recognition with GPT-powered assessment to create an engaging, conversational learning experience. The platform presents fundamental computer science topics in an interactive grid, and when you select a topic, you're prompted to explain it verbally. The AI listens, evaluates your explanation, and provides immediate spoken feedback.
+
+<Note>
+  EliteCode uses OpenAI's Whisper model for speech-to-text transcription and GPT-3.5-turbo for intelligent assessment of your explanations.
+</Note>
+
+## Key Features
+
+### Voice-First Learning
+
+EliteCode emphasizes active learning through verbal explanation. Research shows that teaching a concept out loud significantly improves retention and understanding. The platform:
+
+- **Records your voice** using WebRTC's MediaRecorder API
+- **Transcribes speech** using OpenAI's Whisper AI model running on a Python Flask backend
+- **Analyzes explanations** with GPT-3.5-turbo to assess accuracy and completeness
+- **Responds with voice** using ElevenLabs text-to-speech for natural audio feedback
+
+### Comprehensive Topic Coverage
+
+The platform covers essential data structures and algorithms topics:
+
+- **Data Structures**: Arrays, Linked Lists, Trees, Graphs, Hash Tables, Heaps, Stacks, Queues
+- **Algorithms**: Searching (linear, binary), Sorting (bubble, insertion, selection, merge, quick, heap, bucket, counting)
+- **Complexity Analysis**: Understanding time and space complexity for different approaches
+
+### Interactive Visual Grid
+
+Topics are presented in an engaging bento grid layout with:
+
+- **Animated visualizations** showing how each data structure or algorithm works
+- **Complexity badges** indicating time complexity (O(n²), O(n log n), O(n))
+- **Hover effects** built with Framer Motion for smooth interactions
+- **Responsive design** that adapts to different screen sizes
+
+### Real-Time Audio Processing
+
+The audio pipeline provides:
+
+- **Live audio visualization** with frequency bars during recording
+- **Automatic silence detection** to optimize recording quality
+- **WebM format encoding** for efficient transmission
+- **Streaming playback** of AI-generated feedback
+
+## How It Works
+
+<Steps>
+  <Step title="Select a Topic">
+    Choose from the interactive grid of data structures and algorithms. Each card displays animations and examples.
+  </Step>
+  
+  <Step title="Start Recording">
+    Click the microphone icon to begin recording. The visualizer displays your audio waveform in real-time.
+  </Step>
+  
+  <Step title="Explain the Concept">
+    Speak naturally about the topic. Describe what it is, how it works, when to use it, and its complexity characteristics.
+  </Step>
+  
+  <Step title="Receive AI Feedback">
+    The system transcribes your speech, analyzes your explanation, and generates spoken feedback about the accuracy and completeness of your answer.
+  </Step>
+</Steps>
+
+## Technology Stack
+
+### Frontend Architecture
+
+Built with modern web technologies for a smooth, responsive experience:
+
+```typescript
+// Next.js 14 with TypeScript
+// Key dependencies from package.json
+{
+  "next": "14.1.3",
+  "react": "^18.2.0",
+  "@azure/openai": "^1.0.0-beta.11",
+  "openai": "^4.33.0",
+  "framer-motion": "^11.0.25",
+  "tailwindcss": "^3.3.0"
+}
+```
+
+**Core Components:**
+
+- **Homepage.tsx** - Main interface with bento grid of topics (src/components/ui/Homepage.tsx:9)
+- **Recorder.tsx** - Voice recording with audio visualization (src/components/Recorder.tsx:14)
+- **ModulePopup.tsx** - Modal dialog for interactive learning sessions (src/components/ModulePopup.tsx:7)
+- **Chatbox.tsx** - Message display for conversation history (src/ion/Chatbox.tsx:11)
+
+### Backend Architecture
+
+Python Flask server handling speech recognition:
+
+```python
+# Flask app with Whisper AI
+# From src/python/app.py
+from flask import Flask, request
+import whisper
+import torch
+
+# GPU acceleration when available
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+model = whisper.load_model("base", device=DEVICE)
+
+@app.route('/whisper', methods=['POST'])
+def whisper_handler():
+    # Transcribe audio files
+    result = model.transcribe(temp.name)
+    return {'results': [{
+        'filename': filename,
+        'transcript': result['text']
+    }]}
+```
+
+### AI Integration
+
+**Speech-to-Text:** OpenAI Whisper base model processes audio recordings
+
+**Language Model:** GPT-3.5-turbo evaluates explanations (src/pages/api/openai.ts:9)
+
+```typescript
+const openAiResponse = await openai.chat.completions.create({
+  messages: [{ 
+    role: 'user', 
+    content: "The user is explaining this topic, explain if it is a good explanation or not:" + prompt 
+  }],
+  model: 'gpt-3.5-turbo',
+  max_tokens: 50,
+});
+```
+
+**Text-to-Speech:** ElevenLabs API for natural-sounding voice feedback (src/pages/api/textToSpeech.ts:1)
+
+## Learning Philosophy
+
+EliteCode is built on proven pedagogical principles:
+
+### Active Recall
+
+By explaining concepts from memory, you engage in active recall - one of the most effective learning techniques. This strengthens neural pathways and improves long-term retention.
+
+### Immediate Feedback
+
+The AI provides instant assessment, allowing you to correct misconceptions immediately rather than reinforcing incorrect understanding.
+
+### Multimodal Learning
+
+Combining visual animations, verbal explanation, and auditory feedback engages multiple learning pathways, leading to deeper understanding.
+
+### Spaced Repetition
+
+The platform encourages you to revisit topics, naturally implementing spaced repetition as you practice explaining different concepts.
+
+## Getting Started
+
+Ready to revolutionize your data structures and algorithms learning? Check out the [Quickstart Guide](/quickstart) to begin your journey with EliteCode.
+
+<Card title="Next Steps" icon="rocket" href="/quickstart">
+  Follow our step-by-step guide to start learning with voice interaction
+</Card>

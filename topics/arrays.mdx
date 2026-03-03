@@ -1,0 +1,118 @@
+---
+title: "Arrays"
+description: "Learn about arrays - contiguous memory storage for elements of the same type"
+---
+
+## What is an Array?
+
+An array is a fundamental data structure that stores elements in **contiguous memory locations**. This means all elements are stored next to each other in memory, allowing for fast access to any element using its index.
+
+<Frame>
+  <img src="/array.gif" alt="Array visualization showing elements in contiguous memory" />
+</Frame>
+
+## Key Characteristics
+
+<CardGroup cols={2}>
+  <Card title="Fixed Size" icon="ruler">
+    Arrays typically have a fixed size determined at creation time
+  </Card>
+  <Card title="Same Type" icon="equals">
+    All elements are usually of the same data type
+  </Card>
+  <Card title="Index-Based" icon="hashtag">
+    Elements are accessed using zero-based indexing
+  </Card>
+  <Card title="Contiguous Memory" icon="memory">
+    Elements are stored in adjacent memory locations
+  </Card>
+</CardGroup>
+
+## Time Complexity
+
+| Operation | Time Complexity | Explanation |
+|-----------|----------------|-------------|
+| Access | **O(1)** | Direct access using index |
+| Search | **O(n)** | Must check each element in unsorted array |
+| Insert (end) | **O(1)** | If space available |
+| Insert (middle) | **O(n)** | Must shift elements |
+| Delete | **O(n)** | Must shift elements to fill gap |
+
+## Why Arrays Are Important
+
+Arrays are the foundation for many other data structures and algorithms:
+
+- **Fast access**: O(1) time to access any element by index
+- **Memory efficiency**: No overhead for pointers or links
+- **Cache-friendly**: Contiguous memory improves CPU cache performance
+- **Simple to use**: Straightforward implementation in all languages
+
+## Common Operations
+
+### Accessing Elements
+
+```python
+arr = [1, 2, 3, 4, 5]
+element = arr[2]  # O(1) - Access element at index 2 (value: 3)
+```
+
+### Traversing an Array
+
+```python
+for element in arr:  # O(n) - Visit each element once
+    print(element)
+```
+
+### Inserting Elements
+
+```python
+# Insert at end - O(1) if space available
+arr.append(6)
+
+# Insert at specific position - O(n) requires shifting
+arr.insert(2, 10)  # Insert 10 at index 2
+```
+
+## Space Complexity
+
+Arrays have **O(n)** space complexity, where n is the number of elements. The contiguous memory allocation makes them very space-efficient compared to linked structures.
+
+## Advantages vs Disadvantages
+
+<AccordionGroup>
+  <Accordion title="Advantages">
+    - Constant time access to any element
+    - Simple and easy to use
+    - Memory efficient (no extra pointers)
+    - Cache-friendly due to locality
+    - Supports random access
+  </Accordion>
+  
+  <Accordion title="Disadvantages">
+    - Fixed size (in most languages)
+    - Insertion and deletion are expensive
+    - Wasted space if array not fully utilized
+    - Difficult to insert elements in middle
+  </Accordion>
+</AccordionGroup>
+
+## Real-World Applications
+
+- **Storing lists of items**: Shopping carts, user lists, inventory
+- **Implementing other data structures**: Stacks, queues, heaps
+- **Mathematical operations**: Matrices, vectors
+- **Buffers**: Data streaming, I/O operations
+- **Lookup tables**: Mapping values for quick access
+
+## Interactive Learning
+
+Explore array operations visually in the EliteCode platform. The interactive module demonstrates:
+
+- How elements are arranged in contiguous memory
+- Index-based access patterns
+- Insertion and deletion operations
+- Memory allocation and management
+
+<Note>
+  Arrays are the building block for understanding more complex data structures. Master arrays first before moving to linked lists, trees, and graphs.
+</Note>

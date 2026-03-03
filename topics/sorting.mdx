@@ -1,0 +1,414 @@
+---
+title: "Sorting Algorithms"
+description: "Learn about sorting algorithms - techniques to get a collection of elements in order"
+---
+
+## What is Sorting?
+
+Sorting is the process of arranging elements in a specific order (usually ascending or descending). It's one of the most fundamental operations in computer science, critical for searching, data organization, and optimization.
+
+## Algorithm Categories by Complexity
+
+Sorting algorithms fall into different time complexity classes:
+
+<CardGroup cols={3}>
+  <Card title="O(n²) Algorithms" icon="chart-line" color="#ef4444">
+    Bubble Sort, Insertion Sort, Selection Sort
+  </Card>
+  <Card title="O(n log n) Algorithms" icon="chart-line" color="#f97316">
+    Merge Sort, Quick Sort, Heap Sort
+  </Card>
+  <Card title="Linear Algorithms" icon="chart-line" color="#22c55e">
+    Counting Sort, Bucket Sort, Radix Sort
+  </Card>
+</CardGroup>
+
+## O(n²) Sorting Algorithms
+
+<Frame>
+  <img src="/n2.webp" alt="O(n²) complexity visualization" />
+</Frame>
+
+These algorithms are simple but inefficient for large datasets. They work well for small arrays or nearly sorted data.
+
+### Bubble Sort
+
+Repeatedly steps through the list, compares adjacent elements and swaps them if they're in wrong order.
+
+```python
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        if not swapped:
+            break
+    return arr
+```
+
+**Time Complexity**: O(n²)  
+**Space Complexity**: O(1)  
+**Stable**: Yes
+
+### Insertion Sort
+
+Builds the sorted array one item at a time by inserting each element into its correct position.
+
+```python
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr
+```
+
+**Time Complexity**: O(n²) worst, O(n) best  
+**Space Complexity**: O(1)  
+**Stable**: Yes  
+**Best for**: Small arrays, nearly sorted data
+
+### Selection Sort
+
+Finds the minimum element and places it at the beginning, then repeats for remaining elements.
+
+```python
+def selection_sort(arr):
+    for i in range(len(arr)):
+        min_idx = i
+        for j in range(i + 1, len(arr)):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr
+```
+
+**Time Complexity**: O(n²)  
+**Space Complexity**: O(1)  
+**Stable**: No
+
+<Warning>
+O(n²) algorithms should be avoided for large datasets (n > 1000). They're only practical for small arrays or educational purposes.
+</Warning>
+
+## O(n log n) Sorting Algorithms
+
+<Frame>
+  <img src="/nlogn.png" alt="O(n log n) complexity visualization" />
+</Frame>
+
+These are the most commonly used general-purpose sorting algorithms. They provide excellent performance for most real-world scenarios.
+
+### Merge Sort
+
+Divide-and-conquer algorithm that splits array in half, recursively sorts, then merges.
+
+```python
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+```
+
+**Time Complexity**: O(n log n) - guaranteed  
+**Space Complexity**: O(n)  
+**Stable**: Yes  
+**Best for**: Linked lists, external sorting, when stability matters
+
+### Quick Sort
+
+Picks a pivot element, partitions array around it, then recursively sorts partitions.
+
+```python
+def quick_sort(arr, low=0, high=None):
+    if high is None:
+        high = len(arr) - 1
+    
+    if low < high:
+        pivot_idx = partition(arr, low, high)
+        quick_sort(arr, low, pivot_idx - 1)
+        quick_sort(arr, pivot_idx + 1, high)
+    
+    return arr
+
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
+```
+
+**Time Complexity**: O(n log n) average, O(n²) worst  
+**Space Complexity**: O(log n)  
+**Stable**: No  
+**Best for**: In-place sorting, average-case performance
+
+### Heap Sort
+
+Uses a binary heap data structure to sort elements.
+
+```python
+def heap_sort(arr):
+    n = len(arr)
+    
+    # Build max heap
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+    
+    # Extract elements one by one
+    for i in range(n - 1, 0, -1):
+        arr[0], arr[i] = arr[i], arr[0]
+        heapify(arr, i, 0)
+    
+    return arr
+
+def heapify(arr, n, i):
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+    
+    if left < n and arr[left] > arr[largest]:
+        largest = left
+    if right < n and arr[right] > arr[largest]:
+        largest = right
+    
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        heapify(arr, n, largest)
+```
+
+**Time Complexity**: O(n log n) - guaranteed  
+**Space Complexity**: O(1)  
+**Stable**: No  
+**Best for**: When memory is limited, guaranteed performance
+
+## Linear Time Sorting Algorithms
+
+<Frame>
+  <img src="/linear.webp" alt="Linear time complexity visualization" />
+</Frame>
+
+These algorithms achieve linear time by making assumptions about the input data.
+
+### Counting Sort
+
+Counts occurrences of each value (works for integers in known range).
+
+```python
+def counting_sort(arr):
+    if not arr:
+        return arr
+    
+    max_val = max(arr)
+    min_val = min(arr)
+    range_size = max_val - min_val + 1
+    
+    count = [0] * range_size
+    output = [0] * len(arr)
+    
+    # Count occurrences
+    for num in arr:
+        count[num - min_val] += 1
+    
+    # Calculate cumulative count
+    for i in range(1, len(count)):
+        count[i] += count[i - 1]
+    
+    # Build output array
+    for num in reversed(arr):
+        output[count[num - min_val] - 1] = num
+        count[num - min_val] -= 1
+    
+    return output
+```
+
+**Time Complexity**: O(n + k) where k is range  
+**Space Complexity**: O(k)  
+**Stable**: Yes  
+**Best for**: Small integer ranges
+
+### Bucket Sort
+
+Distributes elements into buckets, sorts buckets individually, then concatenates.
+
+```python
+def bucket_sort(arr):
+    if len(arr) == 0:
+        return arr
+    
+    # Create buckets
+    bucket_count = len(arr)
+    max_val = max(arr)
+    min_val = min(arr)
+    
+    buckets = [[] for _ in range(bucket_count)]
+    
+    # Distribute elements into buckets
+    for num in arr:
+        index = int((num - min_val) / (max_val - min_val + 1) * bucket_count)
+        if index == bucket_count:
+            index -= 1
+        buckets[index].append(num)
+    
+    # Sort individual buckets and concatenate
+    result = []
+    for bucket in buckets:
+        result.extend(sorted(bucket))
+    
+    return result
+```
+
+**Time Complexity**: O(n + k) average  
+**Space Complexity**: O(n + k)  
+**Stable**: Yes  
+**Best for**: Uniformly distributed data
+
+### Radix Sort
+
+Sorts by processing individual digits/characters from least to most significant.
+
+```python
+def radix_sort(arr):
+    if not arr:
+        return arr
+    
+    max_val = max(arr)
+    exp = 1
+    
+    while max_val // exp > 0:
+        counting_sort_by_digit(arr, exp)
+        exp *= 10
+    
+    return arr
+
+def counting_sort_by_digit(arr, exp):
+    n = len(arr)
+    output = [0] * n
+    count = [0] * 10
+    
+    for num in arr:
+        index = (num // exp) % 10
+        count[index] += 1
+    
+    for i in range(1, 10):
+        count[i] += count[i - 1]
+    
+    for i in range(n - 1, -1, -1):
+        index = (arr[i] // exp) % 10
+        output[count[index] - 1] = arr[i]
+        count[index] -= 1
+    
+    for i in range(n):
+        arr[i] = output[i]
+```
+
+**Time Complexity**: O(d × (n + k)) where d is digits  
+**Space Complexity**: O(n + k)  
+**Stable**: Yes  
+**Best for**: Fixed-length integers or strings
+
+## Comparison Table
+
+| Algorithm | Best | Average | Worst | Space | Stable |
+|-----------|------|---------|-------|-------|--------|
+| Bubble Sort | O(n) | O(n²) | O(n²) | O(1) | Yes |
+| Insertion Sort | O(n) | O(n²) | O(n²) | O(1) | Yes |
+| Selection Sort | O(n²) | O(n²) | O(n²) | O(1) | No |
+| Merge Sort | O(n log n) | O(n log n) | O(n log n) | O(n) | Yes |
+| Quick Sort | O(n log n) | O(n log n) | O(n²) | O(log n) | No |
+| Heap Sort | O(n log n) | O(n log n) | O(n log n) | O(1) | No |
+| Counting Sort | O(n + k) | O(n + k) | O(n + k) | O(k) | Yes |
+| Bucket Sort | O(n + k) | O(n + k) | O(n²) | O(n) | Yes |
+| Radix Sort | O(d(n + k)) | O(d(n + k)) | O(d(n + k)) | O(n + k) | Yes |
+
+## Choosing the Right Algorithm
+
+<Tabs>
+  <Tab title="General Purpose">
+    **Use Merge Sort or Quick Sort**
+    - Excellent average-case performance
+    - Quick Sort is faster in practice (better cache locality)
+    - Merge Sort guarantees O(n log n) and is stable
+  </Tab>
+  
+  <Tab title="Memory Constrained">
+    **Use Heap Sort or Quick Sort**
+    - Both have O(1) or O(log n) space
+    - Heap Sort guarantees O(n log n)
+  </Tab>
+  
+  <Tab title="Nearly Sorted">
+    **Use Insertion Sort**
+    - O(n) time for nearly sorted data
+    - Simple and efficient for small arrays
+  </Tab>
+  
+  <Tab title="Integer Data">
+    **Use Counting Sort or Radix Sort**
+    - Linear time when range is reasonable
+    - Very fast for the right data
+  </Tab>
+  
+  <Tab title="Stability Required">
+    **Use Merge Sort**
+    - Maintains relative order of equal elements
+    - Important for multi-key sorting
+  </Tab>
+</Tabs>
+
+## Interactive Learning
+
+EliteCode's sorting module visualizes:
+
+<CardGroup cols={3}>
+  <Card title="O(n²) Algorithms" icon="chart-simple">
+    Watch bubble, insertion, and selection sort step through comparisons
+  </Card>
+  <Card title="O(n log n) Algorithms" icon="chart-line">
+    See merge sort's divide-and-conquer and quick sort's partitioning
+  </Card>
+  <Card title="Linear Algorithms" icon="forward-fast">
+    Understand counting and bucket sort's distribution technique
+  </Card>
+</CardGroup>
+
+<Tip>
+  For most practical applications, use your language's built-in sort (usually a hybrid algorithm like Timsort). Implement custom sorting only when you have specific requirements.
+</Tip>
+
+<Note>
+  Stability matters when sorting complex objects by one field while preserving order of another field.
+</Note>

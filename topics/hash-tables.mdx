@@ -1,0 +1,514 @@
+---
+title: "Hash Tables"
+description: "Learn about hash tables - data structures that map keys to values"
+---
+
+## What is a Hash Table?
+
+A hash table (also called hash map or dictionary) is a data structure that **maps keys to values** for highly efficient lookups. It uses a **hash function** to compute an index into an array of buckets where the desired value can be found.
+
+<Frame>
+  <img src="/hashtable.gif" alt="Hash table visualization showing key-value mapping" />
+</Frame>
+
+## How Hash Tables Work
+
+<Steps>
+  <Step title="Hash Function">
+    A hash function takes a key and converts it to an integer (hash code)
+    
+    ```python
+    hash("apple") → 12345
+    ```
+  </Step>
+  
+  <Step title="Index Calculation">
+    The hash code is mapped to an array index using modulo
+    
+    ```python
+    index = hash_code % array_size
+    12345 % 10 = 5
+    ```
+  </Step>
+  
+  <Step title="Store Value">
+    The key-value pair is stored at the calculated index
+    
+    ```python
+    array[5] = ("apple", "red fruit")
+    ```
+  </Step>
+  
+  <Step title="Handle Collisions">
+    When two keys hash to the same index, use collision resolution (chaining or open addressing)
+  </Step>
+</Steps>
+
+## Key Characteristics
+
+<CardGroup cols={2}>
+  <Card title="Fast Access" icon="bolt">
+    Average O(1) time for insert, search, and delete
+  </Card>
+  <Card title="Key-Value Pairs" icon="key">
+    Each key maps to exactly one value
+  </Card>
+  <Card title="Unique Keys" icon="fingerprint">
+    No duplicate keys allowed (values can repeat)
+  </Card>
+  <Card title="Unordered" icon="shuffle">
+    Elements have no specific order (unless using ordered variants)
+  </Card>
+</CardGroup>
+
+## Time Complexity
+
+| Operation | Average Case | Worst Case | Notes |
+|-----------|-------------|------------|-------|
+| Insert | **O(1)** | **O(n)** | Worst case with many collisions |
+| Search | **O(1)** | **O(n)** | Worst case with many collisions |
+| Delete | **O(1)** | **O(n)** | Worst case with many collisions |
+| Space | **O(n)** | **O(n)** | n key-value pairs |
+
+<Note>
+  With a good hash function and proper load factor management, hash tables provide O(1) operations in practice.
+</Note>
+
+## Hash Function Requirements
+
+A good hash function should:
+
+<AccordionGroup>
+  <Accordion title="Deterministic">
+    Same key always produces same hash value
+    
+    ```python
+    hash("cat") == hash("cat")  # Always true
+    ```
+  </Accordion>
+  
+  <Accordion title="Uniform Distribution">
+    Distribute keys evenly across the hash table to minimize collisions
+  </Accordion>
+  
+  <Accordion title="Fast to Compute">
+    Should be efficient to calculate (typically O(1))
+  </Accordion>
+  
+  <Accordion title="Minimize Collisions">
+    Different keys should rarely produce the same hash value
+  </Accordion>
+</AccordionGroup>
+
+## Implementation
+
+```python
+class HashTable:
+    def __init__(self, size=10):
+        self.size = size
+        self.table = [[] for _ in range(size)]  # Chaining with lists
+        self.count = 0
+    
+    def _hash(self, key):
+        """Hash function: convert key to index"""
+        return hash(key) % self.size
+    
+    def insert(self, key, value):
+        """Insert or update key-value pair"""
+        index = self._hash(key)
+        
+        # Check if key exists and update
+        for i, (k, v) in enumerate(self.table[index]):
+            if k == key:
+                self.table[index][i] = (key, value)
+                return
+        
+        # Key doesn't exist, add new
+        self.table[index].append((key, value))
+        self.count += 1
+        
+        # Resize if load factor too high
+        if self.count / self.size > 0.7:
+            self._resize()
+        # Time: O(1) average
+    
+    def get(self, key):
+        """Retrieve value for given key"""
+        index = self._hash(key)
+        
+        for k, v in self.table[index]:
+            if k == key:
+                return v
+        
+        raise KeyError(f"Key '{key}' not found")
+        # Time: O(1) average
+    
+    def delete(self, key):
+        """Remove key-value pair"""
+        index = self._hash(key)
+        
+        for i, (k, v) in enumerate(self.table[index]):
+            if k == key:
+                del self.table[index][i]
+                self.count -= 1
+                return v
+        
+        raise KeyError(f"Key '{key}' not found")
+        # Time: O(1) average
+    
+    def contains(self, key):
+        """Check if key exists"""
+        try:
+            self.get(key)
+            return True
+        except KeyError:
+            return False
+    
+    def _resize(self):
+        """Double the size and rehash all elements"""
+        old_table = self.table
+        self.size *= 2
+        self.table = [[] for _ in range(self.size)]
+        self.count = 0
+        
+        for bucket in old_table:
+            for key, value in bucket:
+                self.insert(key, value)
+        # Time: O(n)
+    
+    def __len__(self):
+        return self.count
+    
+    def __str__(self):
+        items = []
+        for bucket in self.table:
+            for key, value in bucket:
+                items.append(f"{key}: {value}")
+        return "{" + ", ".join(items) + "}"
+
+# Usage
+ht = HashTable()
+ht.insert("name", "Alice")
+ht.insert("age", 30)
+ht.insert("city", "NYC")
+
+print(ht.get("name"))      # Alice
+print(ht.contains("age"))  # True
+ht.delete("city")
+print(len(ht))             # 2
+```
+
+## Collision Resolution Strategies
+
+### 1. Chaining (Separate Chaining)
+
+Each bucket contains a linked list (or array) of entries that hash to the same index.
+
+```python
+# Example: Two keys hash to index 3
+table[3] = [("apple", 5), ("banana", 3)]
+
+# To find "banana", search through the list at index 3
+```
+
+**Advantages**: Simple, never fills up, deletion is easy  
+**Disadvantages**: Extra memory for pointers, cache performance
+
+### 2. Open Addressing
+
+All entries stored in the array itself. When collision occurs, probe for next empty slot.
+
+**Linear Probing**: Check next slot sequentially
+```python
+index = hash(key) % size
+while table[index] is not None:
+    index = (index + 1) % size
+```
+
+**Quadratic Probing**: Check slots at quadratic intervals
+```python
+index = (hash(key) + i²) % size
+```
+
+**Double Hashing**: Use second hash function to determine probe sequence
+```python
+index = (hash1(key) + i * hash2(key)) % size
+```
+
+**Advantages**: Better cache performance, no extra memory  
+**Disadvantages**: Can cluster, deletion is complex
+
+## Load Factor
+
+Load factor = number of entries / table size
+
+```python
+load_factor = n / size
+```
+
+- **Low load factor (< 0.5)**: Fast but wastes space
+- **High load factor (> 0.75)**: Space-efficient but more collisions
+- **Optimal**: 0.7 for chaining, 0.5 for open addressing
+
+<Tip>
+  When load factor exceeds threshold, resize the hash table (typically double the size) and rehash all entries.
+</Tip>
+
+## Python's Built-in Dictionary
+
+```python
+# Python dict is a hash table
+phone_book = {
+    "Alice": "555-1234",
+    "Bob": "555-5678",
+    "Charlie": "555-9012"
+}
+
+# Operations
+print(phone_book["Alice"])        # Get: O(1)
+phone_book["David"] = "555-3456"  # Insert: O(1)
+del phone_book["Bob"]             # Delete: O(1)
+print("Alice" in phone_book)      # Contains: O(1)
+
+# Iteration
+for name, number in phone_book.items():
+    print(f"{name}: {number}")
+
+# Methods
+phone_book.get("Eve", "Not found")  # Safe get with default
+phone_book.keys()                    # Get all keys
+phone_book.values()                  # Get all values
+phone_book.pop("Charlie")            # Remove and return
+phone_book.clear()                   # Remove all entries
+```
+
+## Common Hash Table Patterns
+
+<CodeGroup>
+```python Count Frequency
+def count_frequency(arr):
+    """Count occurrences of each element"""
+    freq = {}
+    for item in arr:
+        freq[item] = freq.get(item, 0) + 1
+    return freq
+
+print(count_frequency([1, 2, 2, 3, 3, 3]))
+# Output: {1: 1, 2: 2, 3: 3}
+```
+
+```python Two Sum
+def two_sum(nums, target):
+    """Find indices of two numbers that sum to target"""
+    seen = {}  # value -> index
+    
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+    
+    return []
+
+print(two_sum([2, 7, 11, 15], 9))  # [0, 1]
+```
+
+```python Group Anagrams
+def group_anagrams(words):
+    """Group words that are anagrams"""
+    groups = {}
+    
+    for word in words:
+        key = ''.join(sorted(word))
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(word)
+    
+    return list(groups.values())
+
+print(group_anagrams(["eat", "tea", "tan", "ate", "nat", "bat"]))
+# Output: [['eat', 'tea', 'ate'], ['tan', 'nat'], ['bat']]
+```
+
+```python First Unique Character
+def first_unique_char(s):
+    """Find first non-repeating character"""
+    freq = {}
+    for char in s:
+        freq[char] = freq.get(char, 0) + 1
+    
+    for i, char in enumerate(s):
+        if freq[char] == 1:
+            return i
+    
+    return -1
+
+print(first_unique_char("leetcode"))  # 0 (l)
+print(first_unique_char("loveleetcode"))  # 2 (v)
+```
+
+```python LRU Cache
+from collections import OrderedDict
+
+class LRUCache:
+    """Least Recently Used cache using hash table"""
+    def __init__(self, capacity):
+        self.cache = OrderedDict()
+        self.capacity = capacity
+    
+    def get(self, key):
+        if key not in self.cache:
+            return -1
+        self.cache.move_to_end(key)  # Mark as recently used
+        return self.cache[key]
+    
+    def put(self, key, value):
+        if key in self.cache:
+            self.cache.move_to_end(key)
+        self.cache[key] = value
+        if len(self.cache) > self.capacity:
+            self.cache.popitem(last=False)  # Remove oldest
+```
+</CodeGroup>
+
+## Space Complexity
+
+- **Storage**: O(n) for n key-value pairs
+- **With chaining**: O(n + m) where m is table size
+- **With open addressing**: O(m) where m ≥ n
+
+## Real-World Applications
+
+- **Databases**: Indexing for fast lookups
+- **Caching**: Store frequently accessed data (LRU cache)
+- **Symbol tables**: Compilers and interpreters
+- **Routers**: IP address to MAC address mapping
+- **Spell checkers**: Dictionary of valid words
+- **Password storage**: Hash passwords securely
+- **Blockchain**: Transaction verification
+- **DNS**: Domain name to IP address resolution
+
+## Hash Table Variants
+
+<Tabs>
+  <Tab title="HashMap">
+    Standard hash table with no ordering.
+    
+    ```python
+    # Python dict
+    d = {"a": 1, "b": 2}
+    ```
+  </Tab>
+  
+  <Tab title="LinkedHashMap">
+    Maintains insertion order.
+    
+    ```python
+    # Python OrderedDict
+    from collections import OrderedDict
+    od = OrderedDict([("a", 1), ("b", 2)])
+    ```
+  </Tab>
+  
+  <Tab title="TreeMap">
+    Keeps keys sorted (uses BST, not hash table).
+    
+    ```python
+    # Not built-in, but can use sortedcontainers
+    from sortedcontainers import SortedDict
+    sd = SortedDict({"a": 1, "b": 2})
+    ```
+  </Tab>
+  
+  <Tab title="HashSet">
+    Hash table with only keys (no values).
+    
+    ```python
+    # Python set
+    s = {1, 2, 3}
+    ```
+  </Tab>
+</Tabs>
+
+## Common Interview Problems
+
+<AccordionGroup>
+  <Accordion title="Valid Anagram">
+    Check if two strings are anagrams using character frequency count.
+    
+    ```python
+    def is_anagram(s, t):
+        return sorted(s) == sorted(t)
+        # Or: Counter(s) == Counter(t)
+    ```
+  </Accordion>
+  
+  <Accordion title="Contains Duplicate">
+    Check if array has duplicates.
+    
+    ```python
+    def contains_duplicate(nums):
+        return len(nums) != len(set(nums))
+    ```
+  </Accordion>
+  
+  <Accordion title="Longest Consecutive Sequence">
+    Find length of longest consecutive elements sequence.
+    
+    ```python
+    def longest_consecutive(nums):
+        num_set = set(nums)
+        longest = 0
+        
+        for num in num_set:
+            if num - 1 not in num_set:  # Start of sequence
+                length = 1
+                while num + length in num_set:
+                    length += 1
+                longest = max(longest, length)
+        
+        return longest
+    ```
+  </Accordion>
+  
+  <Accordion title="Subarray Sum Equals K">
+    Count subarrays with sum equal to k.
+    
+    ```python
+    def subarray_sum(nums, k):
+        count = 0
+        prefix_sum = 0
+        sum_freq = {0: 1}  # prefix_sum -> frequency
+        
+        for num in nums:
+            prefix_sum += num
+            if prefix_sum - k in sum_freq:
+                count += sum_freq[prefix_sum - k]
+            sum_freq[prefix_sum] = sum_freq.get(prefix_sum, 0) + 1
+        
+        return count
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Interactive Learning
+
+EliteCode's hash table module demonstrates:
+
+- How hash functions map keys to indices
+- Collision resolution with chaining
+- Dynamic resizing when load factor increases
+- Insert, search, and delete operations
+- Performance comparison with other data structures
+
+<Warning>
+  Hash tables don't maintain order. If you need sorted data, use a balanced tree (like TreeMap) instead.
+</Warning>
+
+<Tip>
+  When choosing between hash table and array: use hash table for fast lookups by key, use array for sequential access or index-based operations.
+</Tip>
+
+<Note>
+  Hash tables are one of the most important data structures in programming. They power dictionaries, sets, caches, databases, and countless other applications.
+</Note>

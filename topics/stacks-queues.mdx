@@ -1,0 +1,610 @@
+---
+title: "Stacks and Queues"
+description: "Learn about FIFO and LIFO data structures - queues and stacks"
+---
+
+## FIFO vs LIFO
+
+Stacks and queues are fundamental linear data structures that differ in how elements are added and removed:
+
+<CardGroup cols={2}>
+  <Card title="Stack (LIFO)" icon="layer-group">
+    **Last In, First Out** - Like a stack of plates
+  </Card>
+  <Card title="Queue (FIFO)" icon="arrow-right">
+    **First In, First Out** - Like a line at a store
+  </Card>
+</CardGroup>
+
+<Frame>
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+    <div>
+      <img src="/stack.gif" alt="Stack visualization" />
+    </div>
+    <div>
+      <img src="/queue.gif" alt="Queue visualization" />
+    </div>
+  </div>
+</Frame>
+
+## Stack (LIFO)
+
+A stack is a collection where elements are added and removed from the **same end** (called the "top").
+
+### Core Operations
+
+- **Push**: Add element to top - O(1)
+- **Pop**: Remove element from top - O(1)
+- **Peek/Top**: View top element without removing - O(1)
+- **isEmpty**: Check if stack is empty - O(1)
+
+### Implementation Using Array
+
+```python
+class Stack:
+    def __init__(self):
+        self.items = []
+    
+    def push(self, item):
+        """Add item to top of stack"""
+        self.items.append(item)
+        # Time: O(1)
+    
+    def pop(self):
+        """Remove and return top item"""
+        if self.is_empty():
+            raise IndexError("Pop from empty stack")
+        return self.items.pop()
+        # Time: O(1)
+    
+    def peek(self):
+        """Return top item without removing"""
+        if self.is_empty():
+            raise IndexError("Peek from empty stack")
+        return self.items[-1]
+        # Time: O(1)
+    
+    def is_empty(self):
+        """Check if stack is empty"""
+        return len(self.items) == 0
+        # Time: O(1)
+    
+    def size(self):
+        """Return number of items in stack"""
+        return len(self.items)
+        # Time: O(1)
+
+# Usage
+stack = Stack()
+stack.push(1)
+stack.push(2)
+stack.push(3)
+print(stack.pop())  # 3 (last in, first out)
+print(stack.peek()) # 2
+```
+
+### Implementation Using Linked List
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class Stack:
+    def __init__(self):
+        self.top = None
+        self._size = 0
+    
+    def push(self, item):
+        """Add item to top"""
+        new_node = Node(item)
+        new_node.next = self.top
+        self.top = new_node
+        self._size += 1
+        # Time: O(1)
+    
+    def pop(self):
+        """Remove and return top item"""
+        if self.is_empty():
+            raise IndexError("Pop from empty stack")
+        item = self.top.data
+        self.top = self.top.next
+        self._size -= 1
+        return item
+        # Time: O(1)
+    
+    def peek(self):
+        """Return top item"""
+        if self.is_empty():
+            raise IndexError("Peek from empty stack")
+        return self.top.data
+        # Time: O(1)
+    
+    def is_empty(self):
+        return self.top is None
+    
+    def size(self):
+        return self._size
+```
+
+### Time & Space Complexity
+
+| Operation | Time | Space |
+|-----------|------|-------|
+| Push | O(1) | O(1) |
+| Pop | O(1) | O(1) |
+| Peek | O(1) | O(1) |
+| Search | O(n) | O(1) |
+| Overall Space | O(n) | - |
+
+### Real-World Applications
+
+<AccordionGroup>
+  <Accordion title="Function Call Stack">
+    Programming languages use stacks to manage function calls. Each function call is pushed onto the call stack, and when a function returns, it's popped off.
+    
+    ```python
+    def first():
+        second()  # Push second() onto stack
+    
+    def second():
+        third()   # Push third() onto stack
+    
+    def third():
+        return    # Pop third() from stack
+    
+    first()  # Stack: [first, second, third] -> [first, second] -> [first] -> []
+    ```
+  </Accordion>
+  
+  <Accordion title="Undo/Redo Functionality">
+    Text editors and design software use stacks to implement undo (pop from undo stack) and redo (push to redo stack).
+  </Accordion>
+  
+  <Accordion title="Browser History">
+    The back button uses a stack. Each page visit is pushed, and clicking back pops the stack.
+  </Accordion>
+  
+  <Accordion title="Expression Evaluation">
+    Evaluating mathematical expressions and converting infix to postfix notation.
+    
+    ```python
+    # Evaluate postfix: "2 3 + 5 *"
+    # Stack: [2] -> [2,3] -> [5] -> [5,5] -> [25]
+    ```
+  </Accordion>
+  
+  <Accordion title="Backtracking">
+    Solving mazes, puzzles (Sudoku), and pathfinding algorithms use stacks for depth-first search.
+  </Accordion>
+  
+  <Accordion title="Syntax Parsing">
+    Checking balanced parentheses, brackets, and braces in code.
+  </Accordion>
+</AccordionGroup>
+
+### Common Stack Problems
+
+<CodeGroup>
+```python Valid Parentheses
+def is_valid_parentheses(s):
+    """Check if parentheses are balanced"""
+    stack = []
+    mapping = {')': '(', '}': '{', ']': '['}
+    
+    for char in s:
+        if char in mapping:
+            top = stack.pop() if stack else '#'
+            if mapping[char] != top:
+                return False
+        else:
+            stack.append(char)
+    
+    return not stack
+
+print(is_valid_parentheses("({[]})"))  # True
+print(is_valid_parentheses("({[})"))   # False
+```
+
+```python Evaluate Postfix
+def evaluate_postfix(expression):
+    """Evaluate postfix expression"""
+    stack = []
+    
+    for token in expression.split():
+        if token.isdigit():
+            stack.append(int(token))
+        else:
+            b = stack.pop()
+            a = stack.pop()
+            if token == '+':
+                stack.append(a + b)
+            elif token == '-':
+                stack.append(a - b)
+            elif token == '*':
+                stack.append(a * b)
+            elif token == '/':
+                stack.append(a // b)
+    
+    return stack[0]
+
+print(evaluate_postfix("2 3 + 5 *"))  # 25
+```
+
+```python Min Stack
+class MinStack:
+    """Stack that supports O(1) minimum retrieval"""
+    def __init__(self):
+        self.stack = []
+        self.min_stack = []
+    
+    def push(self, val):
+        self.stack.append(val)
+        if not self.min_stack or val <= self.min_stack[-1]:
+            self.min_stack.append(val)
+    
+    def pop(self):
+        if self.stack[-1] == self.min_stack[-1]:
+            self.min_stack.pop()
+        return self.stack.pop()
+    
+    def top(self):
+        return self.stack[-1]
+    
+    def get_min(self):
+        return self.min_stack[-1]
+```
+</CodeGroup>
+
+## Queue (FIFO)
+
+A queue is a collection where elements are added at the **rear** and removed from the **front**.
+
+### Core Operations
+
+- **Enqueue**: Add element to rear - O(1)
+- **Dequeue**: Remove element from front - O(1)
+- **Front/Peek**: View front element - O(1)
+- **isEmpty**: Check if queue is empty - O(1)
+
+### Implementation Using List (Simple)
+
+```python
+class Queue:
+    def __init__(self):
+        self.items = []
+    
+    def enqueue(self, item):
+        """Add item to rear"""
+        self.items.append(item)
+        # Time: O(1)
+    
+    def dequeue(self):
+        """Remove and return front item"""
+        if self.is_empty():
+            raise IndexError("Dequeue from empty queue")
+        return self.items.pop(0)  # O(n) - not efficient!
+        # Time: O(n) - shifts all elements
+    
+    def front(self):
+        """Return front item"""
+        if self.is_empty():
+            raise IndexError("Front from empty queue")
+        return self.items[0]
+        # Time: O(1)
+    
+    def is_empty(self):
+        return len(self.items) == 0
+    
+    def size(self):
+        return len(self.items)
+```
+
+<Warning>
+  Using `list.pop(0)` is O(n) because it shifts all remaining elements. For better performance, use `collections.deque`.
+</Warning>
+
+### Implementation Using Deque (Efficient)
+
+```python
+from collections import deque
+
+class Queue:
+    def __init__(self):
+        self.items = deque()
+    
+    def enqueue(self, item):
+        """Add item to rear"""
+        self.items.append(item)
+        # Time: O(1)
+    
+    def dequeue(self):
+        """Remove and return front item"""
+        if self.is_empty():
+            raise IndexError("Dequeue from empty queue")
+        return self.items.popleft()
+        # Time: O(1)
+    
+    def front(self):
+        """Return front item"""
+        if self.is_empty():
+            raise IndexError("Front from empty queue")
+        return self.items[0]
+        # Time: O(1)
+    
+    def is_empty(self):
+        return len(self.items) == 0
+    
+    def size(self):
+        return len(self.items)
+
+# Usage
+queue = Queue()
+queue.enqueue(1)
+queue.enqueue(2)
+queue.enqueue(3)
+print(queue.dequeue())  # 1 (first in, first out)
+print(queue.front())    # 2
+```
+
+### Implementation Using Linked List
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class Queue:
+    def __init__(self):
+        self.front = None
+        self.rear = None
+        self._size = 0
+    
+    def enqueue(self, item):
+        """Add item to rear"""
+        new_node = Node(item)
+        if self.rear is None:
+            self.front = self.rear = new_node
+        else:
+            self.rear.next = new_node
+            self.rear = new_node
+        self._size += 1
+        # Time: O(1)
+    
+    def dequeue(self):
+        """Remove and return front item"""
+        if self.is_empty():
+            raise IndexError("Dequeue from empty queue")
+        item = self.front.data
+        self.front = self.front.next
+        if self.front is None:
+            self.rear = None
+        self._size -= 1
+        return item
+        # Time: O(1)
+    
+    def peek(self):
+        if self.is_empty():
+            raise IndexError("Peek from empty queue")
+        return self.front.data
+    
+    def is_empty(self):
+        return self.front is None
+    
+    def size(self):
+        return self._size
+```
+
+### Time & Space Complexity
+
+| Operation | Time (deque) | Time (list) | Space |
+|-----------|-------------|-------------|-------|
+| Enqueue | O(1) | O(1) | O(1) |
+| Dequeue | O(1) | O(n) | O(1) |
+| Front | O(1) | O(1) | O(1) |
+| Search | O(n) | O(n) | O(1) |
+| Overall Space | O(n) | O(n) | - |
+
+### Queue Variations
+
+<Tabs>
+  <Tab title="Circular Queue">
+    Fixed-size queue where rear wraps around to the beginning.
+    
+    ```python
+    class CircularQueue:
+        def __init__(self, capacity):
+            self.capacity = capacity
+            self.queue = [None] * capacity
+            self.front = self.rear = -1
+            self.size = 0
+        
+        def enqueue(self, item):
+            if self.size == self.capacity:
+                raise OverflowError("Queue is full")
+            if self.front == -1:
+                self.front = 0
+            self.rear = (self.rear + 1) % self.capacity
+            self.queue[self.rear] = item
+            self.size += 1
+        
+        def dequeue(self):
+            if self.size == 0:
+                raise IndexError("Queue is empty")
+            item = self.queue[self.front]
+            if self.front == self.rear:
+                self.front = self.rear = -1
+            else:
+                self.front = (self.front + 1) % self.capacity
+            self.size -= 1
+            return item
+    ```
+  </Tab>
+  
+  <Tab title="Priority Queue">
+    Elements are dequeued based on priority, not order.
+    
+    ```python
+    import heapq
+    
+    class PriorityQueue:
+        def __init__(self):
+            self.heap = []
+        
+        def enqueue(self, item, priority):
+            heapq.heappush(self.heap, (priority, item))
+            # Time: O(log n)
+        
+        def dequeue(self):
+            if not self.heap:
+                raise IndexError("Queue is empty")
+            return heapq.heappop(self.heap)[1]
+            # Time: O(log n)
+    ```
+  </Tab>
+  
+  <Tab title="Deque (Double-Ended)">
+    Can add/remove from both ends.
+    
+    ```python
+    from collections import deque
+    
+    dq = deque([1, 2, 3])
+    dq.append(4)      # Add to right
+    dq.appendleft(0)  # Add to left
+    dq.pop()          # Remove from right
+    dq.popleft()      # Remove from left
+    # All operations: O(1)
+    ```
+  </Tab>
+</Tabs>
+
+### Real-World Applications
+
+<AccordionGroup>
+  <Accordion title="Task Scheduling">
+    Operating systems use queues to manage processes waiting for CPU time (FIFO scheduling).
+  </Accordion>
+  
+  <Accordion title="Print Queue">
+    Printers queue documents in order received and print them one by one.
+  </Accordion>
+  
+  <Accordion title="Breadth-First Search">
+    BFS uses a queue to explore nodes level by level in graphs and trees.
+  </Accordion>
+  
+  <Accordion title="Message Queues">
+    Systems like RabbitMQ, Kafka use queues for asynchronous message passing between services.
+  </Accordion>
+  
+  <Accordion title="Call Center Systems">
+    Incoming calls are queued and answered in order (first call, first served).
+  </Accordion>
+  
+  <Accordion title="Keyboard Buffer">
+    Keystrokes are queued and processed in order typed.
+  </Accordion>
+</AccordionGroup>
+
+### Common Queue Problems
+
+<CodeGroup>
+```python Implement Stack Using Queues
+from collections import deque
+
+class StackUsingQueues:
+    def __init__(self):
+        self.q = deque()
+    
+    def push(self, x):
+        self.q.append(x)
+        # Rotate queue so new element is at front
+        for _ in range(len(self.q) - 1):
+            self.q.append(self.q.popleft())
+    
+    def pop(self):
+        return self.q.popleft()
+    
+    def top(self):
+        return self.q[0]
+```
+
+```python Sliding Window Maximum
+from collections import deque
+
+def max_sliding_window(nums, k):
+    """Find maximum in each sliding window"""
+    result = []
+    dq = deque()  # Store indices
+    
+    for i, num in enumerate(nums):
+        # Remove elements outside window
+        if dq and dq[0] < i - k + 1:
+            dq.popleft()
+        
+        # Remove smaller elements (not useful)
+        while dq and nums[dq[-1]] < num:
+            dq.pop()
+        
+        dq.append(i)
+        
+        if i >= k - 1:
+            result.append(nums[dq[0]])
+    
+    return result
+```
+
+```python Generate Binary Numbers
+def generate_binary(n):
+    """Generate binary numbers from 1 to n"""
+    result = []
+    queue = Queue()
+    queue.enqueue("1")
+    
+    for _ in range(n):
+        front = queue.dequeue()
+        result.append(front)
+        queue.enqueue(front + "0")
+        queue.enqueue(front + "1")
+    
+    return result
+
+print(generate_binary(5))
+# Output: ['1', '10', '11', '100', '101']
+```
+</CodeGroup>
+
+## Stack vs Queue Comparison
+
+| Aspect | Stack (LIFO) | Queue (FIFO) |
+|--------|-------------|-------------|
+| **Order** | Last In, First Out | First In, First Out |
+| **Operations** | Push, Pop, Peek | Enqueue, Dequeue, Front |
+| **Access** | Top only | Front and Rear |
+| **Use Cases** | Undo, DFS, Recursion | BFS, Scheduling, Buffers |
+| **Real-World** | Stack of plates | Line at store |
+| **Complexity** | All O(1) | All O(1) with deque |
+
+## Interactive Learning
+
+EliteCode's FIFO/LIFO module visualizes:
+
+<CardGroup cols={2}>
+  <Card title="Stack Operations" icon="layer-group">
+    Watch elements being pushed and popped from the top (LIFO behavior)
+  </Card>
+  <Card title="Queue Operations" icon="arrow-right">
+    See elements enqueued at rear and dequeued from front (FIFO behavior)
+  </Card>
+</CardGroup>
+
+<Tip>
+  In Python, always use `collections.deque` for queue implementations. It provides O(1) operations for both ends, unlike lists.
+</Tip>
+
+<Note>
+  Stacks and queues are not just data structures - they're problem-solving tools. Many complex problems become simple when you recognize them as stack or queue problems.
+</Note>

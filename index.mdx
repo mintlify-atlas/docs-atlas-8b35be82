@@ -1,97 +1,238 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Welcome to EliteCode"
+mode: "custom"
 ---
 
-## Setting up
+<div className="relative overflow-hidden bg-gradient-to-br from-[#23a6d5] via-[#ee7752] to-[#23d5ab] py-20">
+  <div className="absolute inset-0 bg-black/40"></div>
+  <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
+    <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
+      <div className="lg:col-span-7">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+          Master Data Structures & Algorithms Through Voice
+        </h1>
+        <p className="text-lg sm:text-xl text-white/90 max-w-2xl mb-8">
+          EliteCode combines AI-powered voice interaction with interactive visualizations to help you learn computer science fundamentals in a whole new way.
+        </p>
+        <div className="flex flex-wrap gap-4">
+          <a 
+            href="/quickstart" 
+            className="inline-flex items-center px-6 py-3 bg-white text-[#23a6d5] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Get Started
+          </a>
+          <a 
+            href="/introduction" 
+            className="inline-flex items-center px-6 py-3 border-2 border-white/30 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-colors"
+          >
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+    Quick Start
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Get up and running with EliteCode in just a few steps
+  </p>
+  
+  <Steps>
+    <Step title="Choose a Topic">
+      Select from 9 core computer science topics: arrays, linked lists, trees, graphs, sorting algorithms, searching algorithms, stacks & queues, hash tables, or heaps.
+    </Step>
+    <Step title="Start Voice Interaction">
+      Click on any topic card to open the interactive learning module. Grant microphone permissions when prompted to enable voice recording.
+    </Step>
+    <Step title="Explain Your Understanding">
+      Click the microphone icon and explain what you know about the topic. Your voice is transcribed using Whisper AI.
+      
+      <Accordion title="Example Interaction">
+        You might say: "An array is a contiguous block of memory that stores elements of the same type. You can access elements by index in O(1) time."
+        
+        EliteCode will analyze your explanation and provide AI-powered feedback on accuracy and completeness.
+      </Accordion>
+    </Step>
+    <Step title="Receive AI Feedback">
+      Get instant feedback powered by OpenAI GPT, delivered both as text and through text-to-speech audio. Learn what you got right and where to improve.
+    </Step>
+  </Steps>
+</div>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+    Explore by Feature
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Discover what makes EliteCode unique
+  </p>
+  
+  <CardGroup cols={2}>
     <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+      title="Voice-Powered Learning"
+      icon="microphone"
+      href="/features/voice-interaction"
+    >
+      Real-time audio recording and transcription with Whisper AI for hands-free learning
+    </Card>
+    <Card
+      title="Interactive Modules"
+      icon="grid-2"
+      href="/features/learning-modules"
+    >
+      Visual animations and interactive components for each data structure and algorithm
+    </Card>
+    <Card
+      title="AI Feedback"
+      icon="brain"
+      href="/features/ai-feedback"
+    >
+      Intelligent analysis of your explanations with personalized learning guidance
+    </Card>
+    <Card
+      title="Text-to-Speech"
+      icon="volume"
+      href="/api/text-to-speech"
+    >
+      Audio feedback that reads AI responses aloud for accessible learning
+    </Card>
+  </CardGroup>
+</div>
 
-## Create beautiful pages
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+    Learning Topics
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Master fundamental computer science concepts with interactive visualizations
+  </p>
+  
+  <CardGroup cols={3}>
+    <Card
+      title="Arrays"
+      icon="table-cells"
+      href="/topics/arrays"
+    >
+      Contiguous memory storage for fast access
+    </Card>
+    <Card
+      title="Linked Lists"
+      icon="link"
+      href="/topics/linked-lists"
+    >
+      Dynamic data structures with node-based storage
+    </Card>
+    <Card
+      title="Trees"
+      icon="sitemap"
+      href="/topics/trees"
+    >
+      Hierarchical structures for efficient searching
+    </Card>
+    <Card
+      title="Graphs"
+      icon="diagram-project"
+      href="/topics/graphs"
+    >
+      Networks of connected nodes and edges
+    </Card>
+    <Card
+      title="Sorting"
+      icon="arrow-down-wide-short"
+      href="/topics/sorting"
+    >
+      Algorithms from O(n²) to O(n log n)
+    </Card>
+    <Card
+      title="Searching"
+      icon="magnifying-glass"
+      href="/topics/searching"
+    >
+      Linear and binary search techniques
+    </Card>
+    <Card
+      title="Stacks & Queues"
+      icon="layer-group"
+      href="/topics/stacks-queues"
+    >
+      LIFO and FIFO data structures
+    </Card>
+    <Card
+      title="Hash Tables"
+      icon="hashtag"
+      href="/topics/hash-tables"
+    >
+      Key-value pairs with O(1) lookup
+    </Card>
+    <Card
+      title="Heaps"
+      icon="mountain"
+      href="/topics/heaps"
+    >
+      Priority queues and efficient min/max access
+    </Card>
+  </CardGroup>
+</div>
 
-Everything you need to create world-class documentation.
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+    Developer Resources
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Everything you need to customize and extend EliteCode
+  </p>
+  
+  <CardGroup cols={2}>
+    <Card
+      title="Setup Guide"
+      icon="wrench"
+      href="/developer/setup"
+    >
+      Install dependencies and configure your development environment
+    </Card>
+    <Card
+      title="Architecture"
+      icon="building"
+      href="/developer/architecture"
+    >
+      Understand the Next.js frontend and Python backend structure
+    </Card>
+    <Card
+      title="Components"
+      icon="puzzle-piece"
+      href="/developer/components"
+    >
+      Explore the React components that power the interface
+    </Card>
+    <Card
+      title="API Reference"
+      icon="code"
+      href="/api/openai"
+    >
+      Learn how to use the OpenAI, Whisper, and TTS APIs
+    </Card>
+  </CardGroup>
+</div>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<div className="mt-20 mb-16 max-w-5xl mx-auto px-6">
+  <div className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-[#27272a] bg-gray-50 dark:bg-[#1a1d27] p-8 sm:p-12">
+    <div className="text-center">
+      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        Ready to Start Learning?
+      </h2>
+      <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
+        Dive into interactive, voice-powered learning and master data structures and algorithms faster than ever before.
+      </p>
+      <a 
+        href="/quickstart" 
+        className="inline-flex items-center px-6 py-3 bg-[#23a6d5] text-white font-semibold rounded-lg hover:bg-[#1e8fb8] transition-colors"
+      >
+        Get Started Now
+      </a>
+    </div>
+  </div>
+</div>

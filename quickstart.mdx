@@ -1,80 +1,410 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart Guide
+description: Get started with EliteCode in minutes and complete your first voice-powered learning session
 ---
 
-## Get started in three steps
+## Prerequisites
 
-Get your documentation site running locally and make your first customization.
+Before you begin, ensure you have:
 
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+- A modern web browser (Chrome, Firefox, Safari, or Edge)
+- A working microphone connected to your computer
+- Stable internet connection for AI processing
+- Microphone permissions enabled for the application
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  EliteCode uses the Web Audio API and MediaRecorder, which are supported in all modern browsers. Make sure your browser is up to date.
 </Note>
+
+## Installation & Setup
+
+### For Developers
+
+If you're running EliteCode locally, follow these steps:
+
+<Steps>
+  <Step title="Clone the Repository">
+    Clone the EliteCode source code to your local machine:
+    
+    ```bash
+    git clone <repository-url>
+    cd elitecode
+    ```
+  </Step>
+
+  <Step title="Install Dependencies">
+    Install the required Node.js packages:
+    
+    ```bash
+    npm install
+    # or
+    yarn install
+    # or
+    pnpm install
+    ```
+
+    Key dependencies include:
+    - Next.js 14 for the frontend framework
+    - OpenAI SDK for GPT integration
+    - Framer Motion for animations
+    - Tailwind CSS for styling
+  </Step>
+
+  <Step title="Set Up Environment Variables">
+    Create a `.env.local` file in the root directory with your API keys:
+    
+    ```bash
+    NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
+    NEXT_PUBLIC_ELEVEN_API_KEY=your_elevenlabs_api_key
+    NEXT_PUBLIC_API_URL=http://localhost:8000
+    ```
+
+    <Warning>
+      Never commit your API keys to version control. Keep them in `.env.local` which should be in your `.gitignore`.
+    </Warning>
+  </Step>
+
+  <Step title="Start the Python Backend">
+    The Whisper AI model runs on a Flask server. Set it up:
+    
+    ```bash
+    # Install Python dependencies
+    pip install flask flask-cors openai-whisper torch
+
+    # Run the Flask server
+    cd src/python
+    python app.py
+    ```
+
+    The backend will start on `http://localhost:8000` and load the Whisper base model:
+
+    ```python
+    # The server automatically detects GPU availability
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+    model = whisper.load_model("base", device=DEVICE)
+    ```
+  </Step>
+
+  <Step title="Start the Development Server">
+    In a new terminal, start the Next.js development server:
+    
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    # or
+    pnpm dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+  </Step>
+</Steps>
+
+## Your First Learning Session
+
+Now that EliteCode is running, let's walk through your first voice-powered learning session.
+
+### Step 1: Enable Microphone Access
+
+When you first load the application, your browser will request microphone permissions.
+
+<Steps>
+  <Step title="Grant Permissions">
+    Click **Allow** when prompted to grant microphone access. This is required for voice recording.
+    
+    If you accidentally denied permissions:
+    - **Chrome/Edge**: Click the lock icon in the address bar → Site settings → Microphone → Allow
+    - **Firefox**: Click the crossed-out microphone icon → Enable microphone
+    - **Safari**: Safari → Preferences → Websites → Microphone → Allow
+  </Step>
+
+  <Step title="Verify Audio Input">
+    Once permissions are granted, you'll see the microphone icon become active. The system is now ready to record.
+  </Step>
+</Steps>
+
+### Step 2: Choose Your First Topic
+
+The homepage displays an interactive grid of data structures and algorithms topics.
+
+```typescript
+// Available topics in the grid (from Homepage.tsx)
+const topics = [
+  "array",                    // Contiguous memory storage
+  "linked list",              // Series of connected nodes
+  "tree",                     // Hierarchical structure
+  "graph",                    // Nodes connected by edges
+  "hash table",               // Key-value mapping
+  "heap",                     // Binary tree with ordering
+  "fifo / lifo structures",   // Queue and Stack
+  "searching algorithms",     // Linear and binary search
+  "sorting algorithms"        // Various sorting techniques
+]
+```
+
+<Tip>
+  Start with a fundamental topic you're comfortable with, like "array" or "linked list". This helps you get familiar with the voice interaction before tackling more complex topics.
+</Tip>
+
+**To select a topic:**
+
+1. Browse the grid and hover over different cards to see animations
+2. Each card shows:
+   - Visual representation (GIF or animation)
+   - Brief description
+   - Complexity indicators (for algorithm topics)
+3. Click on any card to open the learning session
+
+### Step 3: Start Recording Your Explanation
+
+After selecting a topic, a modal opens with the prompt: **"Explain to me what [topic] is"**
+
+<Steps>
+  <Step title="Click the Microphone Icon">
+    Click the animated microphone icon at the bottom of the modal to begin recording.
+    
+    When recording starts:
+    - The icon changes to an animated "active" state
+    - The audio visualizer displays your voice waveform in real-time
+    - The recording status updates to "recording"
+  </Step>
+
+  <Step title="Speak Your Explanation">
+    Explain the concept naturally, as if teaching a friend. Include:
+    
+    - **Definition**: What is this data structure/algorithm?
+    - **How it works**: Describe the mechanics or process
+    - **Use cases**: When would you use this?
+    - **Complexity**: Time and space complexity characteristics
+    
+    **Example explanation for "array":**
+    
+    > "An array is a contiguous block of memory that stores elements of the same type. You can access any element in constant time using its index. Arrays are great when you know the size in advance and need fast lookups, but inserting or deleting elements in the middle is expensive because you have to shift everything. The access time is O(1), but insertion and deletion are O(n) in the worst case."
+  </Step>
+
+  <Step title="Stop Recording">
+    Click the microphone icon again to stop recording. The audio is automatically uploaded for processing.
+  </Step>
+</Steps>
+
+### Step 4: Processing Your Response
+
+Once you stop recording, EliteCode processes your explanation through multiple AI stages:
+
+```typescript
+// The complete processing pipeline (from ModulePopup.tsx:17)
+const uploadAudio = async (blob: Blob) => {
+  setIsLoading(true);
+  
+  // 1. Upload audio to Whisper backend
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whisper`, {
+    method: "POST",
+    body: formData,
+  });
+  
+  // 2. Extract transcript
+  const text = result?.results?.[0]?.transcript;
+  
+  // 3. Get OpenAI assessment
+  const openAIResponse = await getOpenAiResponse(text);
+  
+  // 4. Convert feedback to speech
+  const ttsResponse = await textToSpeech(openAIResponse);
+  
+  // 5. Play audio feedback
+  audioPlayer.src = ttsResponse.audio_url;
+  audioPlayer.play();
+};
+```
+
+You'll see a loading spinner while the system:
+
+1. **Transcribes** your audio using Whisper AI (~1-2 seconds)
+2. **Analyzes** your explanation with GPT-3.5-turbo (~2-3 seconds)
+3. **Generates** voice feedback with ElevenLabs TTS (~1-2 seconds)
+
+<Note>
+  Total processing time is typically 4-7 seconds depending on recording length and server load.
+</Note>
+
+### Step 5: Receive AI Feedback
+
+The AI evaluates your explanation and provides spoken feedback through your speakers:
+
+**What the AI assesses:**
+
+- **Accuracy**: Is your explanation technically correct?
+- **Completeness**: Did you cover the key concepts?
+- **Clarity**: Was your explanation easy to understand?
+
+**Example feedback you might receive:**
+
+> "Good explanation! You correctly identified that arrays use contiguous memory and provide O(1) access time. You also mentioned the O(n) insertion cost. To improve, you could discuss the fixed size limitation and compare it to dynamic arrays or linked lists."
+
+The feedback is delivered via natural-sounding text-to-speech, maintaining the conversational learning experience.
+
+### Step 6: Try Another Topic
+
+Close the modal and select a different topic to continue learning. Each session is independent, allowing you to:
+
+- Practice explaining different concepts
+- Return to topics you find challenging
+- Build confidence in your understanding
+- Prepare for technical interviews
+
+## Understanding the Interface
+
+### Audio Visualizer
+
+The real-time audio visualizer helps you know the system is listening:
+
+```typescript
+// Audio visualization uses Web Audio API (from Recorder.tsx:158)
+const AudioVisualizer = ({ audioStream, isRecording }) => {
+  const audioCtx = new (window.AudioContext || window.AudioContext)();
+  const analyser = audioCtx.createAnalyser();
+  const source = audioCtx.createMediaStreamSource(audioStream);
+  
+  analyser.fftSize = 256;
+  analyser.getByteFrequencyData(dataArray);
+  
+  // Draw frequency bars that respond to your voice
+  // Bar height increases with volume
+};
+```
+
+The visualizer displays:
+- **Frequency bars** that bounce with your voice
+- **Real-time feedback** showing audio is being captured
+- **Amplitude visualization** to ensure you're speaking loud enough
+
+### Recording States
+
+The recorder has three states:
+
+1. **Inactive** (not recording) - Static microphone icon
+2. **Recording** - Animated microphone with visualizer active
+3. **Processing** - Loading spinner while AI analyzes your response
+
+### Topic Cards
+
+Each topic card in the grid includes:
+
+- **Animated previews** - GIFs showing the concept in action
+- **Hover effects** - Smooth animations powered by Framer Motion
+- **Descriptions** - Brief explanations of each topic
+- **Complexity badges** - Color-coded indicators (red = O(n²), orange = O(n log n), green = O(n))
+
+## Tips for Effective Learning
+
+<CardGroup cols={2}>
+  <Card title="Speak Clearly" icon="microphone">
+    Articulate your words clearly and speak at a normal pace. The Whisper model handles various accents but clarity improves transcription accuracy.
+  </Card>
+
+  <Card title="Be Comprehensive" icon="list-check">
+    Cover multiple aspects: definition, mechanics, use cases, and complexity. More complete explanations receive better feedback.
+  </Card>
+
+  <Card title="Use Technical Terms" icon="code">
+    Don't shy away from proper terminology. Saying "O(n) time complexity" is better than "it's pretty fast."
+  </Card>
+
+  <Card title="Practice Regularly" icon="calendar">
+    Return to topics multiple times. Each session reinforces learning through active recall and immediate feedback.
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+### Microphone Not Working
+
+**Problem**: The recorder won't start or shows a permission error.
+
+**Solutions**:
+1. Check browser permissions (see Step 1 above)
+2. Ensure no other application is using the microphone
+3. Try a different browser
+4. Check system audio settings to verify the microphone is enabled
+
+```typescript
+// Permission check code (from Recorder.tsx:42)
+const getMicrophonePermission = async () => {
+  if ("MediaRecorder" in window) {
+    try {
+      const streamData = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: false,
+      });
+      setPermission(true);
+    } catch (err) {
+      alert(err.message); // Shows specific error
+    }
+  }
+};
+```
+
+### No Audio Playback
+
+**Problem**: You can't hear the AI feedback.
+
+**Solutions**:
+1. Check your system volume
+2. Verify browser audio isn't muted (check the browser tab)
+3. Test with other audio on the same website
+4. Check if browser has autoplay restrictions (try clicking after recording)
+
+### Processing Takes Too Long
+
+**Problem**: The loading spinner stays for more than 10 seconds.
+
+**Solutions**:
+1. Check your internet connection
+2. Verify the Python backend is running (should be at `http://localhost:8000`)
+3. Check API keys are correctly set in `.env.local`
+4. Look at browser console (F12) for error messages
+
+### Transcription Inaccurate
+
+**Problem**: The AI misunderstands your speech.
+
+**Solutions**:
+1. Speak more slowly and clearly
+2. Reduce background noise
+3. Move closer to the microphone
+4. Use a better quality microphone if available
+5. Check microphone input levels in system settings
+
+## Next Steps
+
+Now that you've completed your first learning session:
+
+<CardGroup cols={2}>
+  <Card title="Explore All Topics" icon="grid" href="/topics/arrays">
+    Learn about all available data structures and algorithms in the platform
+  </Card>
+
+  <Card title="Understanding the Architecture" icon="sitemap" href="/developer/architecture">
+    Dive deeper into how EliteCode processes voice and integrates AI models
+  </Card>
+
+  <Card title="API Reference" icon="code" href="/api/openai">
+    Explore the technical APIs if you're interested in contributing or extending EliteCode
+  </Card>
+
+  <Card title="Features Overview" icon="lightbulb" href="/features/voice-interaction">
+    Learn about the key features that make EliteCode effective
+  </Card>
+</CardGroup>
+
+## Join the Community
+
+Have questions or want to share your learning progress? Connect with other EliteCode users:
+
+- **GitHub Discussions**: Share feedback and feature requests
+- **Discord Community**: Get help and discuss learning strategies
+- **Twitter**: Follow updates and tips
+
+---
+
+You're now ready to master data structures and algorithms through voice-powered learning. Start with topics you're familiar with to build confidence, then challenge yourself with more complex concepts. The more you practice explaining, the deeper your understanding becomes!

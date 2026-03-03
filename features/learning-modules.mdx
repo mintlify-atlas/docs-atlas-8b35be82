@@ -1,0 +1,373 @@
+---
+title: 'Learning Modules'
+description: 'Interactive topic cards and popup modules with visual animations'
+---
+
+## Overview
+
+EliteCode's learning modules provide an interactive, visually engaging interface for exploring data structures and algorithms topics. The system uses a Bento Grid layout for topic selection and modal popups for immersive learning experiences.
+
+## Topic Selection Interface
+
+### Bento Grid Layout
+
+The homepage features a dynamic grid of topic cards powered by the `BentoGrid` component:
+
+```tsx BentoGrid.tsx
+export const BentoGrid = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: React.ReactNode;
+}) => {
+  return (
+    <div
+      className={cn(
+        "grid md:auto-rows-[18rem] grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl mx-auto ",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+```
+
+<Info>
+The grid automatically adapts to screen size: single column on mobile, three columns on desktop with 18rem row height.
+</Info>
+
+### Available Topics
+
+EliteCode covers 10 fundamental computer science topics:
+
+<CardGroup cols={2}>
+  <Card title="Array" icon="table">
+    Contiguous memory storage for elements of the same type
+  </Card>
+  
+  <Card title="Linked List" icon="link">
+    Series of connected nodes, each containing data
+  </Card>
+  
+  <Card title="Stack" icon="layer-group">
+    Last in, first out (LIFO) data structure
+  </Card>
+  
+  <Card title="Queue" icon="right-left">
+    First in, first out (FIFO) data structure
+  </Card>
+  
+  <Card title="Tree" icon="diagram-project">
+    Hierarchical data structure with a root and branches
+  </Card>
+  
+  <Card title="Graph" icon="network-wired">
+    Collection of nodes connected by edges
+  </Card>
+  
+  <Card title="Hash Table" icon="hashtag">
+    Data structure that maps keys to values
+  </Card>
+  
+  <Card title="Heap" icon="mountain">
+    Binary tree with a specific ordering property
+  </Card>
+  
+  <Card title="Sorting Algorithms" icon="arrow-down-short-wide">
+    Techniques to rearrange elements in order
+  </Card>
+  
+  <Card title="Searching Algorithms" icon="magnifying-glass">
+    Techniques to find specific elements efficiently
+  </Card>
+</CardGroup>
+
+## Topic Card Component
+
+### BentoGridItem Structure
+
+Each topic card is rendered using the `BentoGridItem` component:
+
+```tsx BentoGrid.tsx
+export const BentoGridItem = ({
+  className,
+  title,
+  description,
+  header,
+  icon,
+}: {
+  className?: string;
+  title?: string | React.ReactNode;
+  description?: string | React.ReactNode;
+  header?: React.ReactNode;
+  icon?: React.ReactNode;
+}) => {
+  return (
+    <div
+      className={cn(
+        "row-span-1 rounded-xl group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-2 dark:bg-black dark:border-white/[0.2] bg-white border border-transparent justify-between flex flex-col space-y-3",
+        className
+      )}
+    >
+      {header}
+      <div className="group-hover/bento:translate-x-2 transition duration-200">
+        {icon}
+        <div className="font-sans font-bold text-neutral-600 dark:text-neutral-200 mb-2 mt-2">
+          {title}
+        </div>
+        <div className="font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
+          {description}
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+### Hover Animations
+
+<Tip>
+Cards feature smooth hover effects:
+- Shadow expands on hover (`hover:shadow-xl`)
+- Content slides right 2px (`group-hover/bento:translate-x-2`)
+- 200ms transition duration for smooth animation
+</Tip>
+
+## Dynamic Grid Sizing
+
+The `Homebento` component implements variable sizing for visual interest:
+
+```tsx BentoGrid.tsx
+export function Homebento() {
+  return (
+    <BentoGrid className="w-full h-full">
+      {items.map((item, i) => {
+        const colSpan =
+          i % 2 === 0
+            ? "lg:col-span-2"
+            : i % 5 === 0
+            ? "lg:col-span-2"
+            : "lg:col-span-1";
+        const rowSpan = i % 3 === 0 ? "sm:row-span-2" : "sm:row-span-1";
+        
+        return (
+          <BentoGridItem
+            key={i}
+            title={item.title}
+            description={item.description}
+            header={item.header}
+            icon={item.icon}
+            className={`${
+              i === 0 ? "lg:col-span-3 " : `opacity-50 ${colSpan} ${rowSpan}`
+            }`}
+          />
+        );
+      });
+    </BentoGrid>
+  );
+}
+```
+
+### Sizing Rules
+
+| Index Pattern | Column Span | Row Span | Effect |
+|---------------|-------------|----------|--------|
+| `i === 0` | 3 columns | Default | Featured first card spans full width |
+| `i % 2 === 0` | 2 columns | Default | Even cards are wider |
+| `i % 3 === 0` | Default | 2 rows | Every third card is taller |
+| `i % 5 === 0` | 2 columns | Default | Every fifth card is wider |
+| Other | 1 column | 1 row | Standard card size |
+
+<Note>
+Non-featured cards have 50% opacity to emphasize the primary topic (Array).
+</Note>
+
+## Module Popup Component
+
+### Modal Structure
+
+When a user selects a topic, the `ChatCard` modal appears:
+
+```tsx ModulePopup.tsx
+export const ChatCard: React.FC<{ onClose: () => void; topic: string }> = ({
+  onClose,
+  topic,
+}) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-2/4 h-3/4 bg-white dark:bg-black rounded-lg shadow-lg p-4 flex flex-col"
+        onClick={handleCardClick}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-0 right-0 m-4 text-4xl"
+        >
+          &times;
+        </button>
+        {!isLoading && (
+          <p className="flex justify-center items-center pt-28 text-xl text-medium">
+            Explain to me what {topic} is
+          </p>
+        )}
+        <Chatbox messages={[]} />
+        <Recorder
+          uploadAudio={uploadAudio}
+          isRecording={isRecording}
+          toggleRecording={toggleRecording}
+        />
+        <audio ref={audioRef} controls style={{ visibility: "hidden" }}></audio>
+      </div>
+    </div>
+  );
+};
+```
+
+### Modal Features
+
+<Steps>
+  <Step title="Overlay Background">
+    Semi-transparent black overlay (`bg-black bg-opacity-50`) covers the entire viewport at z-index 50.
+  </Step>
+  
+  <Step title="Centered Modal">
+    Modal is 50% viewport width and 75% height, centered using flexbox.
+  </Step>
+  
+  <Step title="Click Outside to Close">
+    Clicking the overlay closes the modal, while clicks inside the modal are captured by `handleCardClick`.
+  </Step>
+  
+  <Step title="Close Button">
+    Large × button in top-right corner provides clear exit option.
+  </Step>
+</Steps>
+
+## Loading States
+
+### Spinner Animation
+
+During audio processing, a loading spinner appears:
+
+```tsx ModulePopup.tsx
+{isLoading && (
+  <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50">
+    <div role="status">
+      <svg
+        aria-hidden="true"
+        className="w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+        viewBox="0 0 100 101"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+          fill="currentColor"
+        />
+        <path
+          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+          fill="currentFill"
+        />
+      </svg>
+      <span className="sr-only">Loading...</span>
+    </div>
+  </div>
+)}
+```
+
+<Warning>
+The loading state is critical for user experience during:
+- Audio upload to backend
+- Whisper transcription processing
+- OpenAI API response
+- Text-to-speech generation
+</Warning>
+
+## Audio Playback
+
+### Hidden Audio Player
+
+The modal includes a hidden HTML5 audio element for AI responses:
+
+```tsx ModulePopup.tsx
+const uploadAudio = async (blob: Blob) => {
+  // ... transcription and OpenAI processing ...
+  
+  const ttsResponse = await textToSpeech(openAIResponse);
+  if (ttsResponse) {
+    const audioPlayer = audioRef.current;
+    if (audioPlayer) {
+      audioPlayer.src = ttsResponse.audio_url;
+      audioPlayer
+        .play()
+        .catch((error) => console.error("Error playing audio:", error));
+    }
+  }
+};
+
+// Hidden audio element
+<audio ref={audioRef} controls style={{ visibility: "hidden" }}></audio>
+```
+
+<Tip>
+The audio element is hidden with CSS (`visibility: hidden`) rather than display:none to allow programmatic playback control.
+</Tip>
+
+## Dark Mode Support
+
+All components include dark mode styling:
+
+```tsx
+// Background colors
+dark:bg-black
+
+// Text colors
+dark:text-neutral-200
+dark:text-neutral-300
+
+// Borders
+dark:border-white/[0.2]
+
+// Shadows
+dark:shadow-none
+
+// Gradient backgrounds
+dark:from-neutral-900 dark:to-neutral-800
+```
+
+<Info>
+Dark mode is automatically detected based on user system preferences using Tailwind's `dark:` modifier.
+</Info>
+
+## Integration with Chat System
+
+The module popup integrates with the `Chatbox` component:
+
+```tsx ModulePopup.tsx
+import { Chatbox } from "@/ion/Chatbox";
+
+<Chatbox messages={[]} />
+```
+
+This allows future expansion to display conversation history between the user and AI feedback system.
+
+## Related Features
+
+<CardGroup cols={2}>
+  <Card title="Voice Interaction" icon="microphone" href="/features/voice-interaction">
+    Learn about the recording and transcription system
+  </Card>
+  
+  <Card title="AI Feedback" icon="robot" href="/features/ai-feedback">
+    Discover how explanations are analyzed and evaluated
+  </Card>
+</CardGroup>

@@ -1,0 +1,467 @@
+---
+title: "Searching Algorithms"
+description: "Learn about searching algorithms - finding elements in a list efficiently"
+---
+
+## What is Searching?
+
+Searching is the process of finding a specific element in a collection of data. The efficiency of searching algorithms varies dramatically based on whether the data is sorted and which algorithm is used.
+
+## Algorithm Categories
+
+<CardGroup cols={2}>
+  <Card title="Linear Search" icon="arrow-right" color="#ef4444">
+    O(n) - Sequential search through elements
+  </Card>
+  <Card title="Binary Search" icon="code-branch" color="#22c55e">
+    O(log n) - Divide and conquer on sorted data
+  </Card>
+</CardGroup>
+
+## Linear Search
+
+<Frame>
+  <img src="/linearsearch.gif" alt="Linear search visualization" />
+</Frame>
+
+Linear search checks each element sequentially until the target is found or the list ends.
+
+### Implementation
+
+```python
+def linear_search(arr, target):
+    """
+    Search for target in array by checking each element
+    
+    Time Complexity: O(n)
+    Space Complexity: O(1)
+    """
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i  # Return index where found
+    return -1  # Not found
+
+# Example usage
+arr = [64, 34, 25, 12, 22, 11, 90]
+result = linear_search(arr, 22)
+print(f"Element found at index: {result}")  # Output: 4
+```
+
+### Characteristics
+
+**Time Complexity**: O(n)  
+**Space Complexity**: O(1)  
+**Works on**: Sorted or unsorted data  
+**Best case**: O(1) - element is first  
+**Worst case**: O(n) - element is last or not present
+
+### When to Use Linear Search
+
+<AccordionGroup>
+  <Accordion title="Small datasets">
+    For arrays with fewer than 100 elements, the overhead of binary search may not be worth it. Linear search is simple and fast enough.
+  </Accordion>
+  
+  <Accordion title="Unsorted data">
+    If data is not sorted and you only need to search once, linear search is the only option (sorting would take O(n log n)).
+  </Accordion>
+  
+  <Accordion title="Linked lists">
+    Binary search requires random access. Linear search is the natural choice for linked lists.
+  </Accordion>
+  
+  <Accordion title="First occurrence">
+    When you only need to find the first occurrence and it's likely near the beginning.
+  </Accordion>
+</AccordionGroup>
+
+### Variations
+
+<CodeGroup>
+```python Find All Occurrences
+def linear_search_all(arr, target):
+    """Return all indices where target appears"""
+    indices = []
+    for i in range(len(arr)):
+        if arr[i] == target:
+            indices.append(i)
+    return indices
+```
+
+```python Sentinel Linear Search
+def sentinel_search(arr, target):
+    """Optimized linear search with sentinel"""
+    n = len(arr)
+    last = arr[n - 1]
+    arr[n - 1] = target
+    
+    i = 0
+    while arr[i] != target:
+        i += 1
+    
+    arr[n - 1] = last  # Restore last element
+    
+    if i < n - 1 or arr[n - 1] == target:
+        return i
+    return -1
+```
+
+```python Search with Custom Comparison
+def linear_search_custom(arr, predicate):
+    """Search using custom comparison function"""
+    for i, element in enumerate(arr):
+        if predicate(element):
+            return i
+    return -1
+
+# Usage
+result = linear_search_custom(
+    [{'name': 'Alice', 'age': 30}, {'name': 'Bob', 'age': 25}],
+    lambda x: x['age'] > 26
+)
+```
+</CodeGroup>
+
+<Warning>
+Linear search becomes impractical for large datasets (n > 10,000). If you need repeated searches, sort the data first and use binary search.
+</Warning>
+
+## Binary Search
+
+<Frame>
+  <img src="/binarysearch.png" alt="Binary search visualization" />
+</Frame>
+
+Binary search repeatedly divides a **sorted** array in half, eliminating half of the remaining elements each time.
+
+### How It Works
+
+1. Start with middle element
+2. If target equals middle, done!
+3. If target is less than middle, search left half
+4. If target is greater than middle, search right half
+5. Repeat until found or search space is empty
+
+### Implementation
+
+<Tabs>
+  <Tab title="Iterative">
+    ```python
+    def binary_search(arr, target):
+        """
+        Binary search - iterative version
+        
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+        
+        REQUIRES: arr must be sorted
+        """
+        left = 0
+        right = len(arr) - 1
+        
+        while left <= right:
+            mid = left + (right - left) // 2  # Avoid overflow
+            
+            if arr[mid] == target:
+                return mid  # Found
+            elif arr[mid] < target:
+                left = mid + 1  # Search right half
+            else:
+                right = mid - 1  # Search left half
+        
+        return -1  # Not found
+    ```
+  </Tab>
+  
+  <Tab title="Recursive">
+    ```python
+    def binary_search_recursive(arr, target, left=0, right=None):
+        """
+        Binary search - recursive version
+        
+        Time Complexity: O(log n)
+        Space Complexity: O(log n) - recursion stack
+        
+        REQUIRES: arr must be sorted
+        """
+        if right is None:
+            right = len(arr) - 1
+        
+        # Base case: search space is empty
+        if left > right:
+            return -1
+        
+        mid = left + (right - left) // 2
+        
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            return binary_search_recursive(arr, target, mid + 1, right)
+        else:
+            return binary_search_recursive(arr, target, left, mid - 1)
+    ```
+  </Tab>
+</Tabs>
+
+### Characteristics
+
+**Time Complexity**: O(log n)  
+**Space Complexity**: O(1) iterative, O(log n) recursive  
+**Requires**: Sorted data  
+**Best case**: O(1) - element is at middle  
+**Worst case**: O(log n) - element is at end or not present
+
+### Why O(log n) is Fast
+
+Binary search's logarithmic time means:
+
+| Array Size | Max Comparisons |
+|------------|----------------|
+| 10 | 4 |
+| 100 | 7 |
+| 1,000 | 10 |
+| 1,000,000 | 20 |
+| 1,000,000,000 | 30 |
+
+<Tip>
+  Searching 1 billion elements takes only 30 comparisons! This is the power of O(log n).
+</Tip>
+
+### Binary Search Variations
+
+<CodeGroup>
+```python Find First Occurrence
+def binary_search_first(arr, target):
+    """Find leftmost occurrence of target"""
+    left, right = 0, len(arr) - 1
+    result = -1
+    
+    while left <= right:
+        mid = left + (right - left) // 2
+        
+        if arr[mid] == target:
+            result = mid
+            right = mid - 1  # Continue searching left
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return result
+```
+
+```python Find Last Occurrence
+def binary_search_last(arr, target):
+    """Find rightmost occurrence of target"""
+    left, right = 0, len(arr) - 1
+    result = -1
+    
+    while left <= right:
+        mid = left + (right - left) // 2
+        
+        if arr[mid] == target:
+            result = mid
+            left = mid + 1  # Continue searching right
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return result
+```
+
+```python Find Insert Position
+def binary_search_insert_pos(arr, target):
+    """Find position where target should be inserted"""
+    left, right = 0, len(arr)
+    
+    while left < right:
+        mid = left + (right - left) // 2
+        
+        if arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid
+    
+    return left
+```
+
+```python Find Range
+def binary_search_range(arr, target):
+    """Find range [first, last] of target in sorted array"""
+    def find_bound(arr, target, find_first):
+        left, right = 0, len(arr) - 1
+        result = -1
+        
+        while left <= right:
+            mid = left + (right - left) // 2
+            
+            if arr[mid] == target:
+                result = mid
+                if find_first:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+            elif arr[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+        
+        return result
+    
+    first = find_bound(arr, target, True)
+    if first == -1:
+        return [-1, -1]
+    last = find_bound(arr, target, False)
+    return [first, last]
+```
+</CodeGroup>
+
+## Linear vs Binary Search Comparison
+
+| Aspect | Linear Search | Binary Search |
+|--------|---------------|---------------|
+| **Time Complexity** | O(n) | O(log n) |
+| **Space Complexity** | O(1) | O(1) iterative |
+| **Data Requirement** | Any order | Must be sorted |
+| **Best For** | Small/unsorted data | Large sorted data |
+| **Implementation** | Very simple | Slightly complex |
+| **Data Structure** | Any (array, list) | Random access needed |
+
+<Frame>
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+    <div>
+      <img src="/linearsearch.gif" alt="Linear search - O(n)" />
+      <p style={{textAlign: 'center', fontSize: '0.875rem', marginTop: '0.5rem'}}>Linear Search: O(n)</p>
+    </div>
+    <div>
+      <img src="/binarysearch.png" alt="Binary search - O(log n)" />
+      <p style={{textAlign: 'center', fontSize: '0.875rem', marginTop: '0.5rem'}}>Binary Search: O(log n)</p>
+    </div>
+  </div>
+</Frame>
+
+## Other Search Algorithms
+
+<AccordionGroup>
+  <Accordion title="Jump Search">
+    **Time Complexity**: O(√n)  
+    Jumps ahead by fixed steps, then does linear search. Works on sorted arrays.
+    
+    Better than linear but worse than binary. Useful when jumping backward is costly.
+  </Accordion>
+  
+  <Accordion title="Interpolation Search">
+    **Time Complexity**: O(log log n) average, O(n) worst  
+    Estimates position based on value distribution (like looking up a phone book).
+    
+    Excellent for uniformly distributed data.
+  </Accordion>
+  
+  <Accordion title="Exponential Search">
+    **Time Complexity**: O(log n)  
+    Finds range where element exists by repeated doubling, then binary search.
+    
+    Good for unbounded/infinite arrays.
+  </Accordion>
+  
+  <Accordion title="Ternary Search">
+    **Time Complexity**: O(log₃ n)  
+    Divides into three parts instead of two. Similar to binary search.
+    
+    Not practically better than binary search despite lower constants.
+  </Accordion>
+</AccordionGroup>
+
+## Real-World Applications
+
+- **Databases**: Index lookups (binary search on B-trees)
+- **Autocomplete**: Searching prefix matches
+- **Version control**: Binary search through commits (git bisect)
+- **Game AI**: Searching game trees
+- **Dictionary**: Word lookups
+- **E-commerce**: Product search and filtering
+- **Debugging**: Finding first bad version in software
+
+## Interactive Learning
+
+Explore searching algorithms visually in EliteCode:
+
+<CardGroup cols={2}>
+  <Card title="Linear Search" icon="forward">
+    Watch the algorithm check each element sequentially until the target is found
+  </Card>
+  <Card title="Binary Search" icon="code-branch">
+    See how the search space is halved with each comparison
+  </Card>
+</CardGroup>
+
+## Common Interview Problems
+
+<CodeGroup>
+```python Find Peak Element
+def find_peak(arr):
+    """Find any peak element (greater than neighbors)"""
+    left, right = 0, len(arr) - 1
+    
+    while left < right:
+        mid = left + (right - left) // 2
+        
+        if arr[mid] < arr[mid + 1]:
+            left = mid + 1  # Peak is on right
+        else:
+            right = mid  # Peak is on left or mid
+    
+    return left
+```
+
+```python Search in Rotated Array
+def search_rotated(arr, target):
+    """Search in sorted but rotated array"""
+    left, right = 0, len(arr) - 1
+    
+    while left <= right:
+        mid = left + (right - left) // 2
+        
+        if arr[mid] == target:
+            return mid
+        
+        # Determine which half is sorted
+        if arr[left] <= arr[mid]:  # Left half sorted
+            if arr[left] <= target < arr[mid]:
+                right = mid - 1
+            else:
+                left = mid + 1
+        else:  # Right half sorted
+            if arr[mid] < target <= arr[right]:
+                left = mid + 1
+            else:
+                right = mid - 1
+    
+    return -1
+```
+
+```python Find Minimum in Rotated Array
+def find_min_rotated(arr):
+    """Find minimum element in rotated sorted array"""
+    left, right = 0, len(arr) - 1
+    
+    while left < right:
+        mid = left + (right - left) // 2
+        
+        if arr[mid] > arr[right]:
+            left = mid + 1  # Min is in right half
+        else:
+            right = mid  # Min is in left half or mid
+    
+    return arr[left]
+```
+</CodeGroup>
+
+<Note>
+  Binary search is not just for finding elements! It's a powerful technique for finding boundaries, optimizing functions, and solving many "find the first/last" problems.
+</Note>
+
+<Tip>
+  Before implementing a complex search algorithm, ask: "Is my data sorted?" If yes, binary search is almost always the answer.
+</Tip>

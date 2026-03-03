@@ -1,0 +1,496 @@
+---
+title: "Heaps"
+description: "Learn about heaps - binary trees with a specific ordering property"
+---
+
+## What is a Heap?
+
+A heap is a specialized **tree-based data structure** that satisfies the heap property. It's a complete binary tree where each parent node follows a specific ordering relationship with its children.
+
+<Frame>
+  <img src="/heap.gif" alt="Heap visualization showing binary tree structure" />
+</Frame>
+
+## Heap Property
+
+<CardGroup cols={2}>
+  <Card title="Max Heap" icon="arrow-up">
+    Each parent node is **greater than or equal to** its children. The maximum element is at the root.
+  </Card>
+  <Card title="Min Heap" icon="arrow-down">
+    Each parent node is **less than or equal to** its children. The minimum element is at the root.
+  </Card>
+</CardGroup>
+
+### Max Heap Example
+```
+        100
+       /   \
+      80    90
+     / \   / \
+    70 60 85 75
+
+Root (100) ≥ all descendants
+```
+
+### Min Heap Example
+```
+        10
+       /   \
+      20    30
+     / \   / \
+    40 50 35 45
+
+Root (10) ≤ all descendants
+```
+
+## Key Characteristics
+
+<AccordionGroup>
+  <Accordion title="Complete Binary Tree">
+    All levels are fully filled except possibly the last, which is filled from left to right.
+    
+    This allows efficient array representation without wasted space.
+  </Accordion>
+  
+  <Accordion title="No Ordering Between Siblings">
+    Only parent-child relationships are constrained. Siblings can be in any order.
+    
+    This is different from BST where left < root < right.
+  </Accordion>
+  
+  <Accordion title="Root Contains Extreme Value">
+    Max heap: root is maximum
+    Min heap: root is minimum
+    
+    This enables O(1) access to the extreme value.
+  </Accordion>
+  
+  <Accordion title="Height is O(log n)">
+    Complete binary tree property ensures balanced height of log₂(n).
+  </Accordion>
+</AccordionGroup>
+
+## Time Complexity
+
+| Operation | Time Complexity | Explanation |
+|-----------|----------------|-------------|
+| Get Min/Max | **O(1)** | Root element |
+| Insert | **O(log n)** | Add at end, bubble up |
+| Delete Min/Max | **O(log n)** | Remove root, bubble down |
+| Build Heap | **O(n)** | Heapify from bottom up |
+| Heapify | **O(log n)** | Restore heap property |
+| Search | **O(n)** | No ordering except parent-child |
+
+## Array Representation
+
+Heaps are typically stored in arrays for efficiency:
+
+```python
+# For node at index i:
+parent(i) = (i - 1) // 2
+left_child(i) = 2 * i + 1
+right_child(i) = 2 * i + 2
+
+# Example heap:      90
+#                   /  \
+#                 80   70
+#                / \   /
+#              60 50 40
+
+# Array: [90, 80, 70, 60, 50, 40]
+# Index:  0   1   2   3   4   5
+```
+
+<Tip>
+  Using an array avoids pointer overhead and provides excellent cache performance.
+</Tip>
+
+## Implementation (Min Heap)
+
+```python
+class MinHeap:
+    def __init__(self):
+        self.heap = []
+    
+    def parent(self, i):
+        return (i - 1) // 2
+    
+    def left_child(self, i):
+        return 2 * i + 1
+    
+    def right_child(self, i):
+        return 2 * i + 2
+    
+    def swap(self, i, j):
+        self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+    
+    def insert(self, key):
+        """Add element and maintain heap property"""
+        self.heap.append(key)
+        self._bubble_up(len(self.heap) - 1)
+        # Time: O(log n)
+    
+    def _bubble_up(self, i):
+        """Move element up to maintain heap property"""
+        while i > 0 and self.heap[self.parent(i)] > self.heap[i]:
+            self.swap(i, self.parent(i))
+            i = self.parent(i)
+    
+    def extract_min(self):
+        """Remove and return minimum element (root)"""
+        if not self.heap:
+            raise IndexError("Heap is empty")
+        
+        if len(self.heap) == 1:
+            return self.heap.pop()
+        
+        # Replace root with last element
+        min_val = self.heap[0]
+        self.heap[0] = self.heap.pop()
+        self._bubble_down(0)
+        
+        return min_val
+        # Time: O(log n)
+    
+    def _bubble_down(self, i):
+        """Move element down to maintain heap property"""
+        min_index = i
+        left = self.left_child(i)
+        right = self.right_child(i)
+        
+        # Find smallest among node and its children
+        if left < len(self.heap) and self.heap[left] < self.heap[min_index]:
+            min_index = left
+        
+        if right < len(self.heap) and self.heap[right] < self.heap[min_index]:
+            min_index = right
+        
+        # If smallest is not the current node, swap and recurse
+        if min_index != i:
+            self.swap(i, min_index)
+            self._bubble_down(min_index)
+    
+    def peek(self):
+        """Return minimum without removing"""
+        if not self.heap:
+            raise IndexError("Heap is empty")
+        return self.heap[0]
+        # Time: O(1)
+    
+    def size(self):
+        return len(self.heap)
+    
+    def is_empty(self):
+        return len(self.heap) == 0
+
+# Usage
+heap = MinHeap()
+heap.insert(10)
+heap.insert(5)
+heap.insert(20)
+heap.insert(3)
+
+print(heap.peek())          # 3 (minimum)
+print(heap.extract_min())   # 3
+print(heap.extract_min())   # 5
+```
+
+## Max Heap Implementation
+
+```python
+class MaxHeap(MinHeap):
+    """Max heap - just reverse comparisons"""
+    
+    def _bubble_up(self, i):
+        while i > 0 and self.heap[self.parent(i)] < self.heap[i]:
+            self.swap(i, self.parent(i))
+            i = self.parent(i)
+    
+    def _bubble_down(self, i):
+        max_index = i
+        left = self.left_child(i)
+        right = self.right_child(i)
+        
+        if left < len(self.heap) and self.heap[left] > self.heap[max_index]:
+            max_index = left
+        
+        if right < len(self.heap) and self.heap[right] > self.heap[max_index]:
+            max_index = right
+        
+        if max_index != i:
+            self.swap(i, max_index)
+            self._bubble_down(max_index)
+    
+    def extract_max(self):
+        return self.extract_min()  # Same logic, different name
+```
+
+## Building a Heap
+
+Two approaches to build a heap from an array:
+
+<Tabs>
+  <Tab title="Insertion Method (O(n log n))">
+    ```python
+    def build_heap_insert(arr):
+        """Build heap by inserting elements one by one"""
+        heap = MinHeap()
+        for item in arr:
+            heap.insert(item)  # O(log n) each
+        return heap
+        # Time: O(n log n)
+    ```
+  </Tab>
+  
+  <Tab title="Heapify Method (O(n))">
+    ```python
+    def build_heap_heapify(arr):
+        """Build heap using heapify (more efficient)"""
+        heap = MinHeap()
+        heap.heap = arr.copy()
+        
+        # Start from last non-leaf node and heapify down
+        for i in range(len(arr) // 2 - 1, -1, -1):
+            heap._bubble_down(i)
+        
+        return heap
+        # Time: O(n) - better than O(n log n)!
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  Building a heap using heapify is O(n), not O(n log n), because most nodes are near the bottom and don't need to move far.
+</Note>
+
+## Python's heapq Module
+
+Python provides a built-in min heap implementation:
+
+```python
+import heapq
+
+# Create a heap
+heap = []
+heapq.heappush(heap, 10)  # Insert: O(log n)
+heapq.heappush(heap, 5)
+heapq.heappush(heap, 20)
+heapq.heappush(heap, 3)
+
+print(heap[0])  # Peek at minimum: O(1) → 3
+
+min_val = heapq.heappop(heap)  # Extract min: O(log n) → 3
+print(min_val)
+
+# Build heap from list
+arr = [10, 5, 20, 3, 15]
+heapq.heapify(arr)  # O(n)
+print(arr)  # [3, 5, 20, 10, 15]
+
+# N largest/smallest elements
+nums = [1, 8, 2, 23, 7, -4, 18, 23, 42, 37, 2]
+print(heapq.nlargest(3, nums))   # [42, 37, 23]
+print(heapq.nsmallest(3, nums))  # [-4, 1, 2]
+
+# Max heap workaround (negate values)
+max_heap = []
+heapq.heappush(max_heap, -10)
+heapq.heappush(max_heap, -5)
+max_val = -heapq.heappop(max_heap)  # 10
+```
+
+## Common Heap Patterns
+
+<CodeGroup>
+```python Kth Largest Element
+import heapq
+
+def find_kth_largest(nums, k):
+    """Find kth largest element using min heap"""
+    # Keep min heap of size k
+    heap = nums[:k]
+    heapq.heapify(heap)
+    
+    for num in nums[k:]:
+        if num > heap[0]:
+            heapq.heapreplace(heap, num)
+    
+    return heap[0]
+    # Time: O(n log k), Space: O(k)
+
+print(find_kth_largest([3,2,1,5,6,4], 2))  # 5
+```
+
+```python Merge K Sorted Lists
+import heapq
+
+def merge_k_sorted(lists):
+    """Merge k sorted lists efficiently"""
+    heap = []
+    result = []
+    
+    # Initialize heap with first element from each list
+    for i, lst in enumerate(lists):
+        if lst:
+            heapq.heappush(heap, (lst[0], i, 0))  # (value, list_idx, elem_idx)
+    
+    while heap:
+        val, list_idx, elem_idx = heapq.heappop(heap)
+        result.append(val)
+        
+        # Add next element from same list
+        if elem_idx + 1 < len(lists[list_idx]):
+            next_val = lists[list_idx][elem_idx + 1]
+            heapq.heappush(heap, (next_val, list_idx, elem_idx + 1))
+    
+    return result
+    # Time: O(n log k) where n is total elements
+
+lists = [[1, 4, 5], [1, 3, 4], [2, 6]]
+print(merge_k_sorted(lists))  # [1, 1, 2, 3, 4, 4, 5, 6]
+```
+
+```python Top K Frequent Elements
+from collections import Counter
+import heapq
+
+def top_k_frequent(nums, k):
+    """Find k most frequent elements"""
+    freq = Counter(nums)
+    
+    # Use heap to get k largest frequencies
+    return heapq.nlargest(k, freq.keys(), key=freq.get)
+    # Time: O(n log k)
+
+print(top_k_frequent([1,1,1,2,2,3], 2))  # [1, 2]
+```
+
+```python Median Finder
+import heapq
+
+class MedianFinder:
+    """Find median in stream using two heaps"""
+    def __init__(self):
+        self.small = []  # Max heap (negate values)
+        self.large = []  # Min heap
+    
+    def add_num(self, num):
+        # Add to max heap (small)
+        heapq.heappush(self.small, -num)
+        
+        # Balance: ensure max of small ≤ min of large
+        if self.small and self.large and (-self.small[0] > self.large[0]):
+            val = -heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+        
+        # Balance sizes
+        if len(self.small) > len(self.large) + 1:
+            val = -heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+        
+        if len(self.large) > len(self.small) + 1:
+            val = heapq.heappop(self.large)
+            heapq.heappush(self.small, -val)
+    
+    def find_median(self):
+        if len(self.small) > len(self.large):
+            return -self.small[0]
+        elif len(self.large) > len(self.small):
+            return self.large[0]
+        else:
+            return (-self.small[0] + self.large[0]) / 2.0
+    # add_num: O(log n), find_median: O(1)
+```
+
+```python Task Scheduler
+import heapq
+from collections import Counter
+
+def least_interval(tasks, n):
+    """Minimum intervals to execute tasks with cooldown"""
+    freq = Counter(tasks)
+    max_heap = [-count for count in freq.values()]
+    heapq.heapify(max_heap)
+    
+    time = 0
+    
+    while max_heap:
+        temp = []
+        for _ in range(n + 1):
+            if max_heap:
+                temp.append(heapq.heappop(max_heap))
+        
+        for count in temp:
+            if count + 1 < 0:  # Still has remaining tasks
+                heapq.heappush(max_heap, count + 1)
+        
+        time += len(temp) if not max_heap else n + 1
+    
+    return time
+```
+</CodeGroup>
+
+## Space Complexity
+
+- **Storage**: O(n) for n elements
+- **Operations**: O(1) extra space (in-place)
+- **Recursion**: O(log n) for bubble down/up if using recursion
+
+## Heap vs Other Structures
+
+| Feature | Heap | BST | Array (sorted) |
+|---------|------|-----|---------------|
+| Find Min/Max | O(1) | O(log n) | O(1) |
+| Insert | O(log n) | O(log n) | O(n) |
+| Delete Min/Max | O(log n) | O(log n) | O(n) |
+| Search | O(n) | O(log n) | O(log n) |
+| Space | O(n) | O(n) | O(n) |
+| Ordering | Partial | Full | Full |
+| Use Case | Priority queue | Ordered data | Static sorted data |
+
+## Real-World Applications
+
+- **Priority Queues**: Task scheduling, event simulation
+- **Dijkstra's Algorithm**: Shortest path in graphs
+- **Heap Sort**: Efficient O(n log n) sorting
+- **Median Maintenance**: Finding median in data stream
+- **Job Scheduling**: Operating systems, load balancing
+- **A* Search**: Pathfinding in games and maps
+- **Huffman Coding**: Data compression
+- **K-way Merge**: Merging multiple sorted streams
+
+## Heap Sort
+
+```python
+def heap_sort(arr):
+    """Sort array using heap"""
+    import heapq
+    heapq.heapify(arr)  # O(n)
+    return [heapq.heappop(arr) for _ in range(len(arr))]  # O(n log n)
+    # Total: O(n log n) time, O(1) space if in-place
+
+print(heap_sort([3, 1, 4, 1, 5, 9, 2, 6]))  # [1, 1, 2, 3, 4, 5, 6, 9]
+```
+
+## Interactive Learning
+
+Explore heaps visually in EliteCode's interactive module:
+
+- Watch elements bubble up during insertion
+- See elements bubble down during deletion
+- Understand the complete binary tree structure
+- Compare min heap and max heap operations
+- Visualize heap sort in action
+
+<Warning>
+  Heaps provide O(1) access to min/max but O(n) search for arbitrary elements. Don't use heaps when you need fast search - use hash tables or BSTs instead.
+</Warning>
+
+<Tip>
+  When you need to repeatedly access the smallest (or largest) element, think heap! Priority queues are the killer app for heaps.
+</Tip>
+
+<Note>
+  Heaps are complete binary trees, which is why they can be efficiently stored in arrays without wasting space. This makes them very cache-friendly and space-efficient.
+</Note>

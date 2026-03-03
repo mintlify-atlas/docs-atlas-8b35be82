@@ -1,0 +1,104 @@
+---
+title: 'OpenAI API Integration'
+description: 'Analyze and evaluate user explanations using GPT-3.5 Turbo'
+---
+
+## Overview
+
+The OpenAI API integration provides intelligent analysis of user explanations. It evaluates whether a user's explanation of a topic is accurate and well-constructed using OpenAI's GPT-3.5 Turbo model.
+
+## Function Reference
+
+### `getOpenAiResponse()`
+
+Analyzes a user's explanation and provides feedback on its quality.
+
+<ParamField path="prompt" type="string" required>
+  The user's explanation text to be analyzed
+</ParamField>
+
+<ResponseField name="response" type="string">
+  AI-generated feedback on the explanation quality (max 50 tokens)
+</ResponseField>
+
+## Configuration
+
+<ParamField path="NEXT_PUBLIC_OPENAI_API_KEY" type="string" required>
+  OpenAI API key stored in environment variables
+</ParamField>
+
+<ParamField path="model" type="string" default="gpt-3.5-turbo">
+  The OpenAI model used for analysis
+</ParamField>
+
+<ParamField path="max_tokens" type="number" default="50">
+  Maximum tokens in the response to control output length
+</ParamField>
+
+## Implementation Details
+
+### Model Configuration
+
+The API is configured with the following settings:
+
+- **Model**: `gpt-3.5-turbo`
+- **Max Tokens**: 50 (concise feedback)
+- **Browser Compatibility**: Enabled with `dangerouslyAllowBrowser: true`
+
+### Prompt Structure
+
+The system automatically prepends the following instruction to user input:
+
+```
+The user is explaining this topic, explain if it is a good explanation or not:
+```
+
+## Usage Example
+
+```typescript
+import getOpenAiResponse from './api/openai';
+
+// Analyze a user's explanation
+const userExplanation = "Photosynthesis is how plants make food using sunlight";
+
+const feedback = await getOpenAiResponse(userExplanation);
+console.log(feedback); // AI feedback on explanation quality
+```
+
+## Code Reference
+
+Source: `src/pages/api/openai.ts:7`
+
+```typescript
+async function getOpenAiResponse(prompt: string): Promise<string> {
+    let openAiResponse;
+    openAiResponse = await openai.chat.completions.create({
+      messages: [{ role: 'user', content: "The user is explaining this topic, explain if it is a good explanation or not:" + prompt }],
+      model: 'gpt-3.5-turbo',
+      max_tokens: 50,
+    });
+  
+    const completionResult = await openAiResponse
+    
+    return completionResult.choices[0].message.content ?? '';
+}
+```
+
+## Error Handling
+
+The function returns an empty string if the API response doesn't contain message content. Ensure proper error handling in your implementation:
+
+```typescript
+const feedback = await getOpenAiResponse(explanation);
+if (!feedback) {
+  console.error('No response received from OpenAI');
+}
+```
+
+## Environment Setup
+
+Add your OpenAI API key to `.env.local`:
+
+```bash
+NEXT_PUBLIC_OPENAI_API_KEY=your_api_key_here
+```

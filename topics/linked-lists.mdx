@@ -1,0 +1,200 @@
+---
+title: "Linked Lists"
+description: "Learn about linked lists - a series of connected nodes, each containing data"
+---
+
+## What is a Linked List?
+
+A linked list is a linear data structure where elements are stored as **nodes**, and each node contains:
+1. **Data**: The actual value stored
+2. **Pointer(s)**: Reference to the next (and possibly previous) node
+
+Unlike arrays, linked list elements are **not stored contiguously** in memory.
+
+<Frame>
+  <img src="/linkedlist.gif" alt="Linked list visualization showing connected nodes" />
+</Frame>
+
+## Types of Linked Lists
+
+<CardGroup cols={2}>
+  <Card title="Singly Linked List" icon="arrow-right">
+    Each node points only to the next node. Traversal in one direction only.
+  </Card>
+  <Card title="Doubly Linked List" icon="arrows-left-right">
+    Each node has pointers to both next and previous nodes. Bidirectional traversal.
+  </Card>
+  <Card title="Circular Linked List" icon="rotate">
+    Last node points back to the first node, forming a circle.
+  </Card>
+  <Card title="Doubly Circular" icon="circle-nodes">
+    Combines doubly linked structure with circular connection.
+  </Card>
+</CardGroup>
+
+## Time Complexity
+
+| Operation | Singly Linked | Doubly Linked | Explanation |
+|-----------|---------------|---------------|-------------|
+| Access | **O(n)** | **O(n)** | Must traverse from head |
+| Search | **O(n)** | **O(n)** | Must check each node |
+| Insert (head) | **O(1)** | **O(1)** | Direct pointer update |
+| Insert (tail) | **O(n)** | **O(1)*** | *With tail pointer |
+| Insert (middle) | **O(n)** | **O(n)** | Must traverse to position |
+| Delete (head) | **O(1)** | **O(1)** | Direct pointer update |
+| Delete (middle) | **O(n)** | **O(n)** | Must traverse to node |
+
+## Structure Definition
+
+### Singly Linked List Node
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+```
+
+### Doubly Linked List Node
+
+```python
+class DoublyNode:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+        self.prev = None
+
+class DoublyLinkedList:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+```
+
+## Common Operations
+
+### Inserting at Head
+
+```python
+def insert_at_head(self, data):
+    new_node = Node(data)
+    new_node.next = self.head  # Point to current head
+    self.head = new_node       # Update head
+    # Time: O(1)
+```
+
+### Deleting a Node
+
+```python
+def delete_node(self, key):
+    current = self.head
+    
+    # If head needs to be deleted
+    if current and current.data == key:
+        self.head = current.next
+        return
+    
+    # Search for the node
+    prev = None
+    while current and current.data != key:
+        prev = current
+        current = current.next
+    
+    # Node not found
+    if current is None:
+        return
+    
+    # Unlink the node
+    prev.next = current.next
+    # Time: O(n)
+```
+
+### Traversing the List
+
+```python
+def traverse(self):
+    current = self.head
+    while current:
+        print(current.data)
+        current = current.next
+    # Time: O(n)
+```
+
+## Space Complexity
+
+Linked lists have **O(n)** space complexity, where n is the number of nodes. However, they require extra space for storing pointers:
+
+- **Singly linked**: n elements + n pointers
+- **Doubly linked**: n elements + 2n pointers
+
+## Advantages vs Disadvantages
+
+<AccordionGroup>
+  <Accordion title="Advantages">
+    - Dynamic size (grows and shrinks easily)
+    - Efficient insertion/deletion at beginning - O(1)
+    - No wasted space (allocates memory as needed)
+    - Easy to implement stacks and queues
+    - No need for contiguous memory
+  </Accordion>
+  
+  <Accordion title="Disadvantages">
+    - No random access (must traverse from head)
+    - Extra memory for pointers
+    - Not cache-friendly (scattered in memory)
+    - More complex implementation
+    - Cannot use binary search efficiently
+  </Accordion>
+</AccordionGroup>
+
+## Arrays vs Linked Lists
+
+<Tabs>
+  <Tab title="When to Use Arrays">
+    - Need fast access by index (O(1))
+    - Size is known and relatively fixed
+    - Memory locality is important (cache performance)
+    - Random access patterns
+    - Binary search is needed
+  </Tab>
+  
+  <Tab title="When to Use Linked Lists">
+    - Frequent insertions/deletions at beginning
+    - Unknown or highly variable size
+    - No need for random access
+    - Implementing queues or stacks
+    - Memory is fragmented
+  </Tab>
+</Tabs>
+
+## Real-World Applications
+
+- **Browser history**: Back and forward navigation (doubly linked)
+- **Music playlists**: Next/previous song functionality
+- **Undo functionality**: Store previous states
+- **Memory management**: Free block lists in operating systems
+- **Image viewers**: Next/previous image navigation
+
+## Interactive Learning
+
+The EliteCode platform provides interactive visualizations for:
+
+<CardGroup cols={2}>
+  <Card title="Singly Linked Lists">
+    See how nodes connect in one direction and practice insertions/deletions
+  </Card>
+  <Card title="Doubly Linked Lists">
+    Explore bidirectional traversal and understand the extra prev pointer
+  </Card>
+</CardGroup>
+
+<Warning>
+  Be careful with memory management! Always properly unlink nodes to avoid memory leaks, especially in languages without garbage collection.
+</Warning>
+
+<Tip>
+  Use a dummy head node to simplify edge cases in insertion and deletion operations.
+</Tip>
